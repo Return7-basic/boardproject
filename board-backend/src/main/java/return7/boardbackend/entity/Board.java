@@ -9,7 +9,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder //추후 확인
@@ -26,6 +25,9 @@ public class Board {
     private int viewCount;
     private int recommendation;
 
+    private int upCount;
+    private int downCount;
+
     @Column(name = "created_at")
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -33,7 +35,22 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> replies = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY,  cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User writer;
+
+    public void update(String title,String content){
+        this.title=title;
+        this.content=content;
+    }
+    public void increaseViewCount(){
+        this.viewCount++;
+    }
+
+    public void adjustRecommendation(VoteType type, int delta) { //추후 인자값 이름 변경
+        if (type == VoteType.UP) {
+            this.recommendation += delta;
+        }
+    }
+
 
 }
