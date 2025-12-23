@@ -24,7 +24,6 @@ public class Board {
     private String content;
     private int viewCount;
     private int recommendation;
-    private boolean selected;
 
     private int upCount;
     private int downCount;
@@ -46,5 +45,12 @@ public class Board {
     public void increaseViewCount(){
         this.viewCount++;
     }
+
+    public void adjustRecommendation(VoteType type, int delta) { //추후 인자값 이름 변경
+        if (type == VoteType.UP) {
+            this.recommendation += delta;
+        }
+    }
+
 
 }
