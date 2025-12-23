@@ -1,7 +1,6 @@
 package return7.boardbackend.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.config.CustomUserDetails;
@@ -12,6 +11,7 @@ import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.ReplyVote;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.enums.VoteResult;
+import return7.boardbackend.errors.*;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.ReplyVoteRepository;
@@ -42,8 +42,10 @@ public class ReplyService {
         Reply reply = Reply.builder()
                 .content(replyDto.getContent())
                 .board(boardRepository.findById(replyDto.getBoardId()).orElse(null))
-                .writer(userRepository.findById(replyDto.getWriterId()).orElse(null))
-                .parent(replyRepository.findById(replyDto.getParentId()).orElse(null))
+                .writer(userRepository.findById(replyDto.getWriterId())
+                        .orElseThrow(() -> new UserNotFoundException("답글을 찾을 수 없습니다.")))
+                .parent(replyRepository.findById(replyDto.getParentId())
+                        .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다.")))
                 .build();
         Reply saved = replyRepository.save(reply);
         return ResponseReplyDto.from(saved);
@@ -54,15 +56,17 @@ public class ReplyService {
      * 댓글 수정
      */
     public ResponseReplyDto update(ResponseReplyDto replyDto, CustomUserDetails CustomUserDetails) {
-        Reply reply = replyRepository.findById(replyDto.getId()).orElse(null);
+        Reply reply = replyRepository.findById(replyDto.getId())
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
+        User loginUser = userRepository.findById(CustomUserDetails.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
-        User loginUser = userRepository.findById(CustomUserDetails.getUserId()).orElse(null);
         if (loginUser != reply.getWriter()) {
-            throw new RuntimeException("권한이 없습니다."); // 에러 목록 추가사항
+            throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
         }
 
         if (reply.isDeleted()) {
-            // 추후 삭제 여부 고민
+            throw new AlreadyDeletedReplyException("이미 삭제된 댓글입니다.");
         }
 
         if(reply.getContent() != null) {
@@ -76,10 +80,11 @@ public class ReplyService {
     * 댓글 soft 삭제
      */
     public ResponseReplyDto delete(Long replyId, CustomUserDetails customUserDetails) {
-        Reply reply = replyRepository.findById(replyId).orElse(null);
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
 
         if (!reply.getWriter().getId().equals(customUserDetails.getUserId())) {
-            throw new RuntimeException("권한이 없습니다."); // 에러 목록 추가사항
+            throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
         }
         // 추후 삭제 여부 고민
         if (reply.isDeleted()) {
@@ -101,9 +106,10 @@ public class ReplyService {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (!isAdmin) {
-            throw new RuntimeException("권한이 없습니다.");
+            throw new NoAuthorityException("권한이 없습니다.");
         }
-        Reply reply = replyRepository.findById(replyId).orElse(null);
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         replyRepository.delete(reply);
     }
 
@@ -112,19 +118,24 @@ public class ReplyService {
      */
     @Transactional(readOnly = true)
     public List<ResponseReplyDto> getReplyByBoard(Long boardId) {
-        List<ResponseReplyDto> dtoList =
-                replyRepository.findByBoardId(boardId).stream()
-                        .map(ResponseReplyDto::from)
-                        .collect(Collectors.toList());
-        return dtoList;
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()->new BoardNotFoundException("게시물을 찾을 수 없습니다."));
+
+        List<Reply> replies = board.getReplies();
+
+        return replies.stream()
+                .map(ResponseReplyDto::from)
+                .collect(Collectors.toList());
     }
 
     /**
      * 댓글 채택
      */
     public boolean selectReply(Long replyId) {
-        Reply reply = replyRepository.findById(replyId).orElse(null);
-        Board board = boardRepository.findById(reply.getBoard().getId()).orElse(null);
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
+        Board board = boardRepository.findById(reply.getBoard().getId())
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));;
 
         if(board.isSelected()) {
             throw new RuntimeException("이미 채택된 댓글이 있습니다.");
@@ -137,8 +148,10 @@ public class ReplyService {
     * 댓글 추천 누르기
      */
     public VoteResult voteReply(Long replyId, CustomUserDetails CustomUserDetails) {
-        User voteUser = userRepository.findById(CustomUserDetails.getUserId()).orElse(null);
-        Reply targetReply = replyRepository.findById(replyId).orElse(null);
+        User voteUser = userRepository.findById(CustomUserDetails.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("답글을 찾을 수 없습니다."));
+        Reply targetReply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
 
         Optional<ReplyVote> existVote = replyVoteRepository.findByReplyAndUser(targetReply, voteUser);
 
@@ -162,8 +175,10 @@ public class ReplyService {
      * 댓글 비추천 누르기
      */
     public VoteResult downVoteReply(Long replyId, CustomUserDetails CustomUserDetails) {
-        User voteUser =userRepository.findById(CustomUserDetails.getUserId()).orElse(null);
-        Reply targetReply = replyRepository.findById(replyId).orElse(null);
+        User voteUser =userRepository.findById(CustomUserDetails.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("답글을 찾을 수 없습니다."));
+        Reply targetReply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
 
         Optional<ReplyVote> existVote =  replyVoteRepository.findByReplyAndUser(targetReply, voteUser);
         // 이전 값 여부 확인
