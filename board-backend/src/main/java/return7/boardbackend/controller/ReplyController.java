@@ -75,7 +75,7 @@ public class ReplyController {
     /**
      * 댓글 채택 Api
      */
-    @PostMapping("/{replyId}")
+    @PostMapping("/{replyId}/select")
     public ResponseEntity<Boolean> selectReply(
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -88,7 +88,7 @@ public class ReplyController {
     /**
      * 추천 누르기
      */
-    @PostMapping("/{replyId}")
+    @PostMapping("/{replyId}/vote")
     public ResponseEntity<VoteResult> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(replyService.voteReply(replyId, customUserDetails));
     }
@@ -97,7 +97,7 @@ public class ReplyController {
     /**
      * 비추천 누르기
      */
-    @PostMapping("/{replyId}")
+    @PostMapping("/{replyId}/downvote")
     public ResponseEntity<VoteResult> downVoteReply(
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
