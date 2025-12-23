@@ -3,7 +3,7 @@ package return7.boardbackend.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import return7.boardbackend.enums.VoteType;
 
 @Entity
 @Getter

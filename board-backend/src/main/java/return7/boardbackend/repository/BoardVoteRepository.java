@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.BoardVote;
 import return7.boardbackend.entity.User;
-import return7.boardbackend.entity.VoteType;
+import return7.boardbackend.enums.VoteType;
 
 import java.util.Optional;
 

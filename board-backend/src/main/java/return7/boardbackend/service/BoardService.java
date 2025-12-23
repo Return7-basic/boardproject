@@ -1,7 +1,6 @@
 package return7.boardbackend.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.BoardDTO;
@@ -33,7 +32,6 @@ public class BoardService {
                 .content(boardDTO.getContent())
                 .writer(writer)
                 .viewCount(0)
-                .recommendation(0)
                 .build();
         return boardRepository.save(board).getId();
     }
