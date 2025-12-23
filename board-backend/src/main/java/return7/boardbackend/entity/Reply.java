@@ -1,12 +1,11 @@
 package return7.boardbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 답글 Entity
@@ -16,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder // 추후 확인
 public class Reply {
     @Id
@@ -49,5 +49,7 @@ public class Reply {
     @JoinColumn(name = "parent_id")
     private Reply parent;
 
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reply> children = new ArrayList<>();
 
 }

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
