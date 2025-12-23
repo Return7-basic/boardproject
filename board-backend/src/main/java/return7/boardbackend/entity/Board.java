@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Getter
+@Entity
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder //추후 확인
@@ -24,6 +25,9 @@ public class Board {
     private int viewCount;
     private int recommendation;
     private boolean selected;
+
+    private int upCount;
+    private int downCount;
 
     @Column(name = "created_at")
     @Builder.Default
