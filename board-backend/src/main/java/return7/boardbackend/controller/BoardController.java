@@ -1,6 +1,7 @@
 package return7.boardbackend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.config.CustomUserDetails;
@@ -15,12 +16,13 @@ import java.util.List;
 public class BoardController {
     private final BoardService boardService;
 
-    @PostMapping//게시글 작성
+    /**게시글 작성*/
+    @PostMapping
     public Long createBoard(@RequestBody BoardDTO dto){
        return boardService.createBoard(dto);
     }
 
-    //게시글 상세 조회(조회수 증가)
+    /**게시글 상세 조회(조회수 증가)*/
     @GetMapping("/{boardId}")
     public BoardDTO getBoard(@PathVariable Long boardId){
         return boardService.findById(boardId);
@@ -35,7 +37,7 @@ public class BoardController {
         return boardService.findAll(page,size);
     }
 
-    //게시글 수정
+    /**게시글 수정*/
     @PutMapping("/{boardId}")
     public void updateBoard(
             @PathVariable Long boardId,
@@ -47,7 +49,7 @@ public class BoardController {
         boardService.updateBoard(boardId,dto,loginUserId);
     }
 
-    //게시글 삭제
+    /**게시글 삭제*/
     @DeleteMapping("/{boardId}")
     public void deleteBoard(@PathVariable Long boardId){
         Long loginuserId=1L;
@@ -55,6 +57,13 @@ public class BoardController {
 
     }
 
-
+    /** 게시글 댓글 채택*/
+    @PostMapping("/{boardId}/replies/{replyId}/select")
+    public ResponseEntity<String> selectReply(
+            @PathVariable Long boardId,
+            @PathVariable Long replyId) {
+        boardService.selectReply(boardId, replyId);
+        return ResponseEntity.ok("댓글 채택됨.");
+    }
 
 }
