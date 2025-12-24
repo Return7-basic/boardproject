@@ -5,14 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import return7.boardbackend.config.CustomUserDetails;
+import return7.boardbackend.security.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.service.ReplyService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/boards/{boardId}/replies")

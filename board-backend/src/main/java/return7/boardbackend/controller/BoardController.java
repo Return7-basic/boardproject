@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import return7.boardbackend.config.CustomUserDetails;
+import return7.boardbackend.security.CustomUserDetails;
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.service.BoardService;
 
