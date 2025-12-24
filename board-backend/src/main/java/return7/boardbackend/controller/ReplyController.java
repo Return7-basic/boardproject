@@ -23,9 +23,6 @@ public class ReplyController {
     private final ReplyService replyService;
     private final BoardService boardService;
 
-    // page기능 어떡할지 ? - 100개 단위로 쪼개기
-    // 대댓글 접기 여부 백엔드? 프론트?
-
     /**
      * 댓글 작성 Api
      */
@@ -77,8 +74,10 @@ public class ReplyController {
     public ResponseEntity<SliceResponseDto> getReply(
             @PathVariable Long boardId,
             @RequestParam(required = false) Long cursorId,
-            @RequestParam(defaultValue = "100")int size){
-        SliceResponseDto result = replyService.getReplyByBoard(boardId, cursorId, size);
+            @RequestParam(defaultValue = "100")int size,
+            @RequestParam (defaultValue = "latest")String sort,
+            @RequestParam(required = false)Integer cursorScore){
+        SliceResponseDto result = replyService.getReplyByBoard(boardId, sort, cursorScore, cursorId, size);
         return ResponseEntity.ok(result);
     }
 

@@ -20,6 +20,7 @@ import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.ReplyVoteRepository;
 import return7.boardbackend.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,12 +123,19 @@ public class ReplyService {
      * 보드ID 기준 댓글 전체 목록 (임시)
      */
     @Transactional(readOnly = true)
-    public SliceResponseDto getReplyByBoard(Long boardId, Long cursorId, int size) {
+    public SliceResponseDto getReplyByBoard(Long boardId,String sort, Integer cursorScore, Long cursorId, int size) {
         Pageable pageable = PageRequest.of(0, size +1);
+        List<Reply> replies = new ArrayList<>();
 
-        List<Reply> replies = (cursorId == null)
-                ? replyRepository.findByBoardIdOrderByIdDesc(boardId, pageable)
-                : replyRepository.findByBoardIdAndIdLessThanOrderByIdDesc(boardId, cursorId, pageable);
+        if ("latest".equalsIgnoreCase(sort.trim())){
+            replies = (cursorId == null)
+                    ? replyRepository.findByBoardIdOrderByIdDesc(boardId, pageable)
+                    : replyRepository.findByBoardIdAndIdLessThanOrderByIdDesc(boardId, cursorId, pageable);
+        } else {
+            replies = (cursorId == null)
+                    ? replyRepository.findByBoardIdOrderByRecommendationDescAndIdDesc(boardId, pageable)
+                    : replyRepository.findByBest(boardId,cursorScore, cursorId, pageable);
+        }
 
         boolean hasNext = false;
         if (replies.size() > size) {
@@ -139,9 +147,22 @@ public class ReplyService {
                 .map(ResponseReplyDto::from)
                 .toList();
 
-        Long nextCursor = replies.isEmpty() ? -1 : replies.get(replies.size() - 1).getId();
+        Long nextCursor;
+        Integer nextScore;
+        if (!replies.isEmpty()) {
+             nextCursor = replies.get(replies.size() - 1).getId();
+            if (!"latest".equalsIgnoreCase(sort.trim())) {
+                nextScore = replies.get(replies.size() - 1).getRecommendation();
+            } else {
+                nextScore = null;
+            }
+        } else {
+            nextCursor = -1L;
+            nextScore = null;
+        }
 
-        return new SliceResponseDto(dtoList, hasNext, nextCursor);
+
+        return new SliceResponseDto(dtoList, hasNext, nextCursor, nextScore);
     }
 
     /**
