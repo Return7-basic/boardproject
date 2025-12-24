@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.entity.Board;
+import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
-import return7.boardbackend.exception.BoardNotFoundException;
-import return7.boardbackend.exception.UserNotFoundException;
-import return7.boardbackend.exception.WriterNotMatchException;
+import return7.boardbackend.exception.*;
 import return7.boardbackend.repository.BoardRepository;
+import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final ReplyRepository replyRepository;
 
     /**
      * 게시글 생성
@@ -84,7 +85,7 @@ public class BoardService {
 
 
     /**
-     * 게시글 수정
+     * 게시글 삭제
      */
     @Transactional
     public void deleteBoard(Long boardId,Long loginUserId){
@@ -96,13 +97,43 @@ public class BoardService {
         }
         boardRepository.delete(board);
     }
-    /** 댓글 채택 여부 확인*/
-    
+    /**
+     * 관리자권한 게시글 삭제
+     */
     @Transactional
-    public void selectComment(Long boardId, Long commentId){
+    public void adminDeleteBoard(Long boardId, Long loginUserId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new ReplyAlreadyAcceptedException(""))
+                .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
+
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(() -> new UserNotFoundException("작성자를 찾을 수 없습니다."));
+
+        boolean isWriter = board.getWriter().getId().equals(user.getId());
+        boolean isAdmin = "ADMIN".equals(user.getAuthority());
+
+        if (!isWriter && !isAdmin) {
+            throw new NoAuthorityException("게시글 삭제 권한이 없습니다.");
+        }
+
+        boardRepository.delete(board);
     }
 
-    // admin 게시글 삭제 <= NoAuthorityException
+    /** 게시글의 댓글 채택 */
+    @Transactional
+    public void selectReply(Long boardId, Long replyId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다"));
+
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("댓글을 찾을 수 없습니다"));
+
+        // 댓글이 해당 게시글의 것인지 확인
+        if (!reply.getBoard().getId().equals(boardId)) {
+            throw new WriterNotMatchException("해당 게시글의 댓글이 아닙니다");
+        }
+
+        // 채택 처리
+        board.selectReply(reply);
+
+    }
 }
