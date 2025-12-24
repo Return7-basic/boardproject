@@ -31,7 +31,6 @@ public class ReplyVote {
     private Reply reply;
 
     // 추천,비추천 구분 상태 필드
-    // 제
     private boolean voted;
 
     public ReplyVote(User user, Reply reply, boolean voted) {

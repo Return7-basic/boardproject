@@ -7,6 +7,8 @@ import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.BoardVote;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.enums.VoteType;
+import return7.boardbackend.errors.BoardNotFoundException;
+import return7.boardbackend.errors.UserNotFoundException;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.BoardVoteRepository;
 import return7.boardbackend.repository.UserRepository;
@@ -24,11 +26,11 @@ public class BoardVoteService {
 
         // 사용자 조회
         User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                .orElseThrow(() -> new UserNotFoundException("사용자 없음"));
 
         // 게시글 조회
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("게시글 없음"));
+                .orElseThrow(() -> new BoardNotFoundException("게시글 없음"));
 
         // 기존 투표 조회
         boardVoteRepository.findByBoardAndUser(board, user)

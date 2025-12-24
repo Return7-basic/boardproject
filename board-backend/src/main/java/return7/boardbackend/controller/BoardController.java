@@ -1,7 +1,9 @@
 package return7.boardbackend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.BoardDTO;
 import return7.boardbackend.service.BoardService;
 
@@ -37,9 +39,11 @@ public class BoardController {
     @PutMapping("/{boardId}")
     public void updateBoard(
             @PathVariable Long boardId,
-            @RequestBody BoardDTO dto
-    ){
-        Long loginUserId=1L;//임시로 로그인한 유저 추후에바뀌어야함.Long loginUserId = SecurityUtil.getCurrentUserId();
+            @RequestBody BoardDTO dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            ){
+        // Long loginUserId=1L;//임시로 로그인한 유저 추후에바뀌어야함.Long loginUserId = SecurityUtil.getCurrentUserId();
+        Long loginUserId = customUserDetails.getUserId();
         boardService.updateBoard(boardId,dto,loginUserId);
     }
 

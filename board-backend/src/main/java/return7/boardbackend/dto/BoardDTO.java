@@ -16,7 +16,8 @@ public class BoardDTO {
     private String content;
 
     private int viewCount;
-    private int recommendation;
+    private int upCount;
+    private int downCount;
 
     private String writerLoginId;
     private String writerNickname;
@@ -28,7 +29,8 @@ public class BoardDTO {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .viewCount(board.getViewCount())
-                .recommendation(board.getRecommendation())
+                .upCount(board.getUpCount())
+                .downCount(board.getDownCount())
                 .writerLoginId(board.getWriter().getLoginId())
                 .writerNickname(board.getWriter().getNickName())
                 .createdAt(board.getCreatedAt())

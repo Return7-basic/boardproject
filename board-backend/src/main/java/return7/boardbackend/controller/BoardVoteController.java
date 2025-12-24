@@ -6,20 +6,20 @@ import return7.boardbackend.service.BoardVoteService;
 import return7.boardbackend.enums.VoteType;
 
 @RestController
-@RequestMapping("/api/boards/{boardId}/votes")
+@RequestMapping("/api/boards/{boardId}")
 @RequiredArgsConstructor
 public class BoardVoteController {
     private final BoardVoteService boardVoteService;
 
     //추천
-    @PostMapping("up")
+    @PostMapping("/up")
     public void upVote(@PathVariable Long boardId,
                         @RequestHeader("UserLoginId example") String loginId // 임시용,securitycontext로교체
     ){
         boardVoteService.vote(boardId, loginId, VoteType.UP);
     }
     //비추천
-    @PostMapping("down")
+    @PostMapping("/down")
     public void downVote(@PathVariable Long boardId,
                         @RequestHeader("UserLoginId example")String loginId){
         boardVoteService.vote(boardId, loginId, VoteType.DOWN);

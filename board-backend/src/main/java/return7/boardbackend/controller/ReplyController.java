@@ -19,6 +19,8 @@ import java.util.List;
 public class ReplyController {
     private final ReplyService replyService;
 
+    // page기능 어떡할지 100개 단위로 쪼개기
+
     /**
      * 댓글 작성 Api
      * */
@@ -88,7 +90,7 @@ public class ReplyController {
     /**
      * 추천 누르기
      */
-    @PostMapping("/{replyId}/vote")
+    @PostMapping("/{replyId}/up")
     public ResponseEntity<VoteType> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(replyService.voteReply(replyId, customUserDetails));
     }
@@ -97,7 +99,7 @@ public class ReplyController {
     /**
      * 비추천 누르기
      */
-    @PostMapping("/{replyId}/downvote")
+    @PostMapping("/{replyId}/down")
     public ResponseEntity<VoteType> downVoteReply(
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails

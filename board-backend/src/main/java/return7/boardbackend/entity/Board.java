@@ -28,6 +28,8 @@ public class Board {
     private int upCount;
     private int downCount;
 
+    private boolean selected;
+
     @Column(name = "created_at")
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

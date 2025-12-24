@@ -6,6 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.BoardDTO;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.User;
+import return7.boardbackend.errors.BoardNotFoundException;
+import return7.boardbackend.errors.UserNotFoundException;
+import return7.boardbackend.errors.WriterNotMatchException;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +28,7 @@ public class BoardService {
     @Transactional
     public Long createBoard(BoardDTO boardDTO){
         User writer = userRepository.findByLoginId(boardDTO.getWriterLoginId())
-                .orElseThrow(() -> new RuntimeException("작성자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("작성자를 찾을 수 없습니다."));
 
         Board board = Board.builder()
                 .title(boardDTO.getTitle())
@@ -51,7 +54,7 @@ public class BoardService {
     @Transactional
     public BoardDTO findById(Long boardId){
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
         //추후 전역 예외 생성
 
         board.increaseViewCount();
@@ -63,10 +66,10 @@ public class BoardService {
     @Transactional
     public void updateBoard(Long boardId, BoardDTO dto,Long loginUserId){
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
 
         if(!board.getWriter().getId().equals(loginUserId)){//작성자만 수정가능하게.
-            throw new RuntimeException("수정 권한이 없습니다.");
+            throw new WriterNotMatchException("수정 권한이 없습니다.");
         }
         board.update(dto.getTitle(), dto.getContent());
 
@@ -76,11 +79,13 @@ public class BoardService {
     @Transactional
     public void deleteBoard(Long boardId,Long loginUserId){
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
 
         if(!board.getWriter().getId().equals(loginUserId)){//작성자만 수정가능하게.
-            throw new RuntimeException("삭제 권한이 없습니다.");
+            throw new WriterNotMatchException("삭제 권한이 없습니다.");
         }
         boardRepository.delete(board);
     }
+
+    // admin 게시글 삭제 <= NoAuthorityException
 }
