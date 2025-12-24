@@ -6,5 +6,12 @@ import return7.boardbackend.entity.User;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    //회원 가입시 중복 검사
+
+    //로그인,인증
     Optional<User> findByLoginId(String loginId);
+
+    boolean existsByLoginId(String loginId);
+
+    boolean existsByNickName(String nickName);
 }
