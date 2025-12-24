@@ -148,21 +148,9 @@ public class ReplyService {
      * 댓글 채택
      */
     @Transactional
-    public boolean selectReply(Long replyId, CustomUserDetails CustomUserDetails) {
+    public boolean selectReply(Long replyId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
-        Board board = boardRepository.findById(reply.getBoard().getId())
-                .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));;
-        User loginUser = userRepository.findById(CustomUserDetails.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
-
-        if (loginUser != board.getWriter()) {
-            throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
-        }
-
-        if(board.isSelected()) {
-            throw new ReplyAlreadyAcceptedException("이미 채택된 댓글이 있습니다.");
-        }
 
         reply.setSelected(true);
         return true;

@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
+import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
+import return7.boardbackend.service.BoardService;
 import return7.boardbackend.service.ReplyService;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReplyController {
     private final ReplyService replyService;
+    private final BoardService boardService;
 
     // page기능 어떡할지 ? - 100개 단위로 쪼개기
     // 대댓글 접기 여부 백엔드? 프론트?
@@ -84,10 +87,12 @@ public class ReplyController {
      */
     @PostMapping("/{replyId}/select")
     public ResponseEntity<Boolean> selectReply(
+            @PathVariable Long boardId,
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        boolean result = replyService.selectReply(replyId, customUserDetails);
+        SelectedReplyDto selected = boardService.selectReply(boardId, replyId, customUserDetails);
+        boolean result = replyService.selectReply(selected.getReplyId());
         return ResponseEntity.ok(result);
     }
 

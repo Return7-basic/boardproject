@@ -65,13 +65,14 @@ public class BoardController {
         Long loginUserId = customUserDetails.getUserId();
         boardService.adminDeleteBoard(boardId, loginUserId);
     }
-    /** 게시글 댓글 채택*/
-    @PostMapping("/{boardId}/replies/{replyId}/select")
-    public ResponseEntity<String> selectReply(
-            @PathVariable Long boardId,
-            @PathVariable Long replyId) {
-        boardService.selectReply(boardId, replyId);
-        return ResponseEntity.ok("댓글 채택됨.");
-    }
+
+//    /** 게시글 댓글 채택*/
+//    @PostMapping("/{boardId}/replies/{replyId}/select")
+//    public ResponseEntity<String> selectReply(
+//            @PathVariable Long boardId,
+//            @PathVariable Long replyId) {
+//        boardService.selectReply(boardId, replyId);
+//        return ResponseEntity.ok("댓글 채택됨.");
+//    }
 
 }
