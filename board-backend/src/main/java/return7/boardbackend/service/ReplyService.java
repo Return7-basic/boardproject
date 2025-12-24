@@ -1,11 +1,14 @@
 package return7.boardbackend.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
+import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.ReplyVote;
@@ -19,7 +22,6 @@ import return7.boardbackend.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,15 +122,26 @@ public class ReplyService {
      * 보드ID 기준 댓글 전체 목록 (임시)
      */
     @Transactional(readOnly = true)
-    public List<ResponseReplyDto> getReplyByBoard(Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new BoardNotFoundException("게시물을 찾을 수 없습니다."));
+    public SliceResponseDto getReplyByBoard(Long boardId, Long cursorId, int size) {
+        Pageable pageable = PageRequest.of(0, size +1);
 
-        List<Reply> replies = board.getReplies();
+        List<Reply> replies = (cursorId == null)
+                ? replyRepository.findByBoardIdOrderByIdDesc(boardId, pageable)
+                : replyRepository.findByBoardIdAndIdLessThanOrderByIdDesc(boardId, cursorId, pageable);
 
-        return replies.stream()
+        boolean hasNext = false;
+        if (replies.size() > size) {
+            hasNext = true;
+            replies.remove(size);
+        }
+
+        List<ResponseReplyDto> dtoList = replies.stream()
                 .map(ResponseReplyDto::from)
-                .collect(Collectors.toList());
+                .toList();
+
+        Long nextCursor = replies.isEmpty() ? -1 : replies.get(replies.size() - 1).getId();
+
+        return new SliceResponseDto(dtoList, hasNext, nextCursor);
     }
 
     /**

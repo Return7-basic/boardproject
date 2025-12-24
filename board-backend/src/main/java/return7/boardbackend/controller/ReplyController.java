@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
+import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.service.ReplyService;
 
@@ -70,9 +71,12 @@ public class ReplyController {
      * 전체 댓글 조회
      */
     @GetMapping()
-    public ResponseEntity<List<ResponseReplyDto>> getReply(@PathVariable Long boardId){
-        // List<ResponseReplyDto> replyByBoard = replyService.getReplyByBoard(boardId);
-        // return ResponseEntity.ok(replyByBoard);
+    public ResponseEntity<SliceResponseDto> getReply(
+            @PathVariable Long boardId,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "100")int size){
+        SliceResponseDto result = replyService.getReplyByBoard(boardId, cursorId, size);
+        return ResponseEntity.ok(result);
     }
 
     /**
