@@ -3,6 +3,7 @@ package return7.boardbackend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import return7.boardbackend.enums.VoteType;
+import return7.boardbackend.exception.ReplyAlreadyAcceptedException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,7 +29,14 @@ public class Board {
     private int upCount;
     private int downCount;
 
-    private boolean selected;
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean selected=false;
+
+    /**채택된 댓글 참조*/
+    @OneToOne
+    @JoinColumn(name="selected_reply_id")
+    private Reply selectedReply;
 
     @Column(name = "created_at")
     @Builder.Default
@@ -69,5 +77,13 @@ public class Board {
         applyVote(to);
     }
 
+    //* 채택 관련 메서드*/
+    public void selectReply(Reply reply) {
+        if(this.selected) {
+            throw new ReplyAlreadyAcceptedException("이미 채택된 댓글이 있습니다.");
+        }
+        this.selected=true;
+        this.selectedReply=reply;
+    }
 
 }
