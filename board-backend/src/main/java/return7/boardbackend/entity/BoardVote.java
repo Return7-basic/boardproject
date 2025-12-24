@@ -3,7 +3,7 @@ package return7.boardbackend.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import return7.boardbackend.enums.VoteType;
 
 @Entity
 @Getter
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "board_vote",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "board_id"})//뭐가문제였지?
+        @UniqueConstraint(columnNames = {"user_id", "board_id"})
 }
 )
 public class BoardVote {

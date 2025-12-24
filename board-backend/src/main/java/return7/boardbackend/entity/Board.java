@@ -2,6 +2,7 @@ package return7.boardbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import return7.boardbackend.enums.VoteType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +25,8 @@ public class Board {
     private String content;
     private int viewCount;
     private int recommendation;
-    private boolean selected;
+    @Builder.Default
+    private boolean selected = false;
 
     private int upCount;
     private int downCount;

@@ -51,5 +51,4 @@ public class Reply {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> children = new ArrayList<>();
-
 }

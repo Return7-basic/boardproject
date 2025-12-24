@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
-import return7.boardbackend.enums.VoteResult;
+import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.service.ReplyService;
 
 import java.util.List;
@@ -89,7 +89,7 @@ public class ReplyController {
      * 추천 누르기
      */
     @PostMapping("/{replyId}/vote")
-    public ResponseEntity<VoteResult> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<VoteType> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(replyService.voteReply(replyId, customUserDetails));
     }
 
@@ -98,7 +98,7 @@ public class ReplyController {
      * 비추천 누르기
      */
     @PostMapping("/{replyId}/downvote")
-    public ResponseEntity<VoteResult> downVoteReply(
+    public ResponseEntity<VoteType> downVoteReply(
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {

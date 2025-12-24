@@ -1,7 +1,7 @@
 package return7.boardbackend.enums;
 
-public enum VoteResult {
-    LIKE,
-    DISLIKE,
+public enum VoteType {
+    UP,
+    DOWN,
     CANCEL
 }

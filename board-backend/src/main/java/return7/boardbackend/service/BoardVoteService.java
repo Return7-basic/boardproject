@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.BoardVote;
 import return7.boardbackend.entity.User;
-import return7.boardbackend.entity.VoteType;
+import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.BoardVoteRepository;
 import return7.boardbackend.repository.UserRepository;

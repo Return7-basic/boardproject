@@ -2,9 +2,8 @@ package return7.boardbackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import return7.boardbackend.repository.BoardVoteRepository;
 import return7.boardbackend.service.BoardVoteService;
-import return7.boardbackend.entity.VoteType;
+import return7.boardbackend.enums.VoteType;
 
 @RestController
 @RequestMapping("/api/boards/{boardId}/votes")

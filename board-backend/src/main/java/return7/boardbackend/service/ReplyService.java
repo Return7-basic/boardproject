@@ -10,7 +10,8 @@ import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.ReplyVote;
 import return7.boardbackend.entity.User;
-import return7.boardbackend.enums.VoteResult;
+import return7.boardbackend.enums.VoteType;
+import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.errors.*;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.ReplyRepository;
@@ -154,7 +155,7 @@ public class ReplyService {
     /**
     * 댓글 추천 누르기
      */
-    public VoteResult voteReply(Long replyId, CustomUserDetails CustomUserDetails) {
+    public VoteType voteReply(Long replyId, CustomUserDetails CustomUserDetails) {
         User voteUser = userRepository.findById(CustomUserDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply targetReply = replyRepository.findById(replyId)
@@ -166,22 +167,22 @@ public class ReplyService {
             ReplyVote replyVote = existVote.get();
             if (replyVote.isVoted()) {
                 replyVoteRepository.delete(replyVote);
-                return VoteResult.CANCEL;
+                return VoteType.CANCEL;
             }
             else {
                 replyVote.setVoted(true);
-                return VoteResult.LIKE;
+                return VoteType.UP;
             }
         }else {
             replyVoteRepository.save(new ReplyVote(voteUser, targetReply, true));
-            return VoteResult.LIKE;
+            return VoteType.UP;
         }
     }
 
     /**
      * 댓글 비추천 누르기
      */
-    public VoteResult downVoteReply(Long replyId, CustomUserDetails CustomUserDetails) {
+    public VoteType downVoteReply(Long replyId, CustomUserDetails CustomUserDetails) {
         User voteUser =userRepository.findById(CustomUserDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply targetReply = replyRepository.findById(replyId)
@@ -195,15 +196,15 @@ public class ReplyService {
             // 이미 비추천상태에서 클릭한 경우 취소처리
             if(!replyVote.isVoted()) {
                 replyVoteRepository.delete(replyVote);
-                return VoteResult.CANCEL;
+                return VoteType.CANCEL;
             } else {
                 // 추천상태에서 비추천으로 바꿈
                 replyVote.setVoted(false);
-                return VoteResult.DISLIKE;
+                return VoteType.DOWN;
             }
         } else {
             replyVoteRepository.save(new ReplyVote(voteUser, targetReply, false));
-            return VoteResult.DISLIKE;
+            return VoteType.DOWN;
         }
     }
 }
