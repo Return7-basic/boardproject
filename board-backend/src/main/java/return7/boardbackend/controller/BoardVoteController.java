@@ -14,7 +14,7 @@ public class BoardVoteController {
     //추천
     @PostMapping("up")
     public void upVote(@PathVariable Long boardId,
-                        @RequestHeader("UserLoginId example") String loginId // 임시용
+                        @RequestHeader("UserLoginId example") String loginId // 임시용,securitycontext로교체
     ){
         boardVoteService.vote(boardId, loginId, VoteType.UP);
     }

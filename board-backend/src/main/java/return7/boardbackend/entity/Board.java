@@ -24,9 +24,6 @@ public class Board {
     @Column(nullable = false)
     private String content;
     private int viewCount;
-    private int recommendation;
-    @Builder.Default
-    private boolean selected = false;
 
     private int upCount;
     private int downCount;
@@ -49,10 +46,25 @@ public class Board {
         this.viewCount++;
     }
 
-    public void adjustRecommendation(VoteType type, int delta) { //추후 인자값 이름 변경
+    public void applyVote(VoteType type) {
         if (type == VoteType.UP) {
-            this.recommendation += delta;
+            upCount++;
+        } else {
+            downCount++;
         }
+    }
+
+    public void cancelVote(VoteType type) {
+        if (type == VoteType.UP) {
+            upCount--;
+        } else {
+            downCount--;
+        }
+    }
+
+    public void changeVote(VoteType from, VoteType to) {
+        cancelVote(from);
+        applyVote(to);
     }
 
 
