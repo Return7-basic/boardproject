@@ -11,8 +11,8 @@ import return7.boardbackend.enums.VoteType;
 @Table(
         name = "board_vote",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "board_id"})
-}
+            @UniqueConstraint(columnNames = {"user_id", "board_id"})
+        }
 )
 public class BoardVote {
 

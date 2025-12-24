@@ -1,4 +1,4 @@
-package return7.boardbackend.errors;
+package return7.boardbackend.exception;
 
 /**
  * 예외처리 - 게시글을 찾을 수 없음

@@ -1,4 +1,4 @@
-package return7.boardbackend.dto;
+package return7.boardbackend.dto.board;
 
 import lombok.*;
 import return7.boardbackend.entity.Board;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BoardDTO {
+public class BoardDto {
 
     private Long id;
     private String title;
@@ -23,8 +23,8 @@ public class BoardDTO {
     private String writerNickname;
     private LocalDateTime createdAt;
 
-    public static BoardDTO from(Board board){
-        return BoardDTO.builder()
+    public static BoardDto from(Board board){
+        return BoardDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())

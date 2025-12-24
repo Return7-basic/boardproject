@@ -7,8 +7,8 @@ import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.BoardVote;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.enums.VoteType;
-import return7.boardbackend.errors.BoardNotFoundException;
-import return7.boardbackend.errors.UserNotFoundException;
+import return7.boardbackend.exception.BoardNotFoundException;
+import return7.boardbackend.exception.UserNotFoundException;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.BoardVoteRepository;
 import return7.boardbackend.repository.UserRepository;
@@ -21,6 +21,9 @@ public class BoardVoteService {
     private final UserRepository userRepository;
     private final BoardVoteRepository boardVoteRepository;
 
+    /**
+     * 추천 비추천 적용
+     */
     @Transactional
     public void vote(Long boardId, String loginId, VoteType type) {
 
@@ -40,7 +43,9 @@ public class BoardVoteService {
                 );
     }
 
-    // 기존 투표 처리
+    /**
+     * 기존 투표 처리
+     */
     private void handleExistingVote(BoardVote existingVote,
                                     VoteType type,
                                     Board board) {
@@ -57,7 +62,9 @@ public class BoardVoteService {
         existingVote.changeVote(type);
     }
 
-    // 신규 투표 생성
+    /**
+     * 신규 투표 생성
+     */
     private void createNewVote(Board board, User user, VoteType type) {
 
         BoardVote vote = BoardVote.builder()

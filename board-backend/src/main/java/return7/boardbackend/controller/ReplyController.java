@@ -19,11 +19,12 @@ import java.util.List;
 public class ReplyController {
     private final ReplyService replyService;
 
-    // page기능 어떡할지 100개 단위로 쪼개기
+    // page기능 어떡할지 ? - 100개 단위로 쪼개기
+    // 대댓글 접기 여부 백엔드? 프론트?
 
     /**
      * 댓글 작성 Api
-     * */
+     */
     @PostMapping
     public ResponseEntity<ResponseReplyDto> createReply(
             @RequestBody RequestReplyDto reqReplyDto,
@@ -70,8 +71,8 @@ public class ReplyController {
      */
     @GetMapping()
     public ResponseEntity<List<ResponseReplyDto>> getReply(@PathVariable Long boardId){
-        List<ResponseReplyDto> replyByBoard = replyService.getReplyByBoard(boardId);
-        return ResponseEntity.ok(replyByBoard);
+        // List<ResponseReplyDto> replyByBoard = replyService.getReplyByBoard(boardId);
+        // return ResponseEntity.ok(replyByBoard);
     }
 
     /**
@@ -84,7 +85,6 @@ public class ReplyController {
     ) {
         boolean result = replyService.selectReply(replyId, customUserDetails);
         return ResponseEntity.ok(result);
-
     }
 
     /**

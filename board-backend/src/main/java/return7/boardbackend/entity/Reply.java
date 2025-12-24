@@ -7,16 +7,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 답글 Entity
- */
 @Entity
 @Table(name = "replies")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder // 추후 확인
+@Builder
 public class Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

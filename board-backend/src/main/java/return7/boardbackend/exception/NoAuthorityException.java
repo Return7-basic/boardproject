@@ -1,4 +1,4 @@
-package return7.boardbackend.errors;
+package return7.boardbackend.exception;
 
 /**
  * 예외처리 - 어드민 권한이 없을 떄

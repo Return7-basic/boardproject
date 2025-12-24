@@ -10,9 +10,14 @@ import java.util.Optional;
 
 public interface BoardVoteRepository extends JpaRepository<BoardVote, Long> {
 
-    //유저가 게시글에 이미 투표 여부
+    /**
+     * 유저가 게시글에 이미 투표하였는지 여부
+     */
     boolean existsByBoardAndUser(Board board, User user);
 
+    /**
+     * 유저 게시글에 투표한 전체 정보
+     */
     //유적 게시글에 투표를 한 전체 정보.
     Optional<BoardVote> findByBoardAndUser(Board board, User user);
 

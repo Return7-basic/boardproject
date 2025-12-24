@@ -3,12 +3,12 @@ package return7.boardbackend.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import return7.boardbackend.dto.BoardDTO;
+import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.User;
-import return7.boardbackend.errors.BoardNotFoundException;
-import return7.boardbackend.errors.UserNotFoundException;
-import return7.boardbackend.errors.WriterNotMatchException;
+import return7.boardbackend.exception.BoardNotFoundException;
+import return7.boardbackend.exception.UserNotFoundException;
+import return7.boardbackend.exception.WriterNotMatchException;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +24,11 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
 
-    //게시글 생성
+    /**
+     * 게시글 생성
+     */
     @Transactional
-    public Long createBoard(BoardDTO boardDTO){
+    public Long createBoard(BoardDto boardDTO){
         User writer = userRepository.findByLoginId(boardDTO.getWriterLoginId())
                 .orElseThrow(() -> new UserNotFoundException("작성자를 찾을 수 없습니다."));
 
@@ -39,32 +41,37 @@ public class BoardService {
         return boardRepository.save(board).getId();
     }
 
-    //게시글 전체 조회
+    /**
+     * 게시글 전체 조회
+     */
     @Transactional(readOnly = true)
-    public List<BoardDTO> findAll(int page,int size){//내림차순정렬.
+    public List<BoardDto> findAll(int page, int size){//내림차순정렬.
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
         return boardRepository.findAll(pageable)
                 .stream()
-                .map(BoardDTO::from)
+                .map(BoardDto::from)
                 .collect(Collectors.toList());
     }
 
-    //게시글 상세 조회
+    /**
+     * 게시글 상세 조회
+     */
     @Transactional
-    public BoardDTO findById(Long boardId){
+    public BoardDto findById(Long boardId){
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
-        //추후 전역 예외 생성
 
         board.increaseViewCount();
 
-        return BoardDTO.from(board);
+        return BoardDto.from(board);
     }
 
-    //게시글 수정
+    /**
+     * 게시글 수정
+     */
     @Transactional
-    public void updateBoard(Long boardId, BoardDTO dto,Long loginUserId){
+    public void updateBoard(Long boardId, BoardDto dto, Long loginUserId){
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
 
@@ -75,7 +82,10 @@ public class BoardService {
 
     }
 
-    //게시글 삭제
+
+    /**
+     * 게시글 수정
+     */
     @Transactional
     public void deleteBoard(Long boardId,Long loginUserId){
         Board board = boardRepository.findById(boardId)
@@ -85,6 +95,13 @@ public class BoardService {
             throw new WriterNotMatchException("삭제 권한이 없습니다.");
         }
         boardRepository.delete(board);
+    }
+    /** 댓글 채택 여부 확인*/
+    
+    @Transactional
+    public void selectComment(Long boardId, Long commentId){
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()->new ReplyAlreadyAcceptedException(""))
     }
 
     // admin 게시글 삭제 <= NoAuthorityException

@@ -1,4 +1,4 @@
-package return7.boardbackend.errors;
+package return7.boardbackend.exception;
 
 /**
  * 예외처리 - 이미 채택된 댓글이 존재할 때

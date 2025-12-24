@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import return7.boardbackend.errors.*;
+import return7.boardbackend.exception.*;
 
 /**
  * 커스텀 에러 전역 처리

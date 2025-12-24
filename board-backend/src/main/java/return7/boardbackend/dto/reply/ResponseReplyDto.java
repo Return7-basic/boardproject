@@ -5,7 +5,8 @@ import return7.boardbackend.entity.Reply;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

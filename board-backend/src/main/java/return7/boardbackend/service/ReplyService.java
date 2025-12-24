@@ -11,8 +11,7 @@ import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.ReplyVote;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.enums.VoteType;
-import return7.boardbackend.enums.VoteType;
-import return7.boardbackend.errors.*;
+import return7.boardbackend.exception.*;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.ReplyVoteRepository;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
@@ -39,6 +37,7 @@ public class ReplyService {
     /**
      * 댓글 작성
      */
+    @Transactional
     public ResponseReplyDto create(RequestReplyDto replyDto, CustomUserDetails customUserDetails) {
         Reply reply = Reply.builder()
                 .content(replyDto.getContent())
@@ -56,6 +55,7 @@ public class ReplyService {
     /**
      * 댓글 수정
      */
+    @Transactional
     public ResponseReplyDto update(ResponseReplyDto replyDto, CustomUserDetails CustomUserDetails) {
         Reply reply = replyRepository.findById(replyDto.getId())
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
@@ -78,8 +78,9 @@ public class ReplyService {
     }
 
     /**
-    * 댓글 soft 삭제
+     * 댓글 soft 삭제
      */
+    @Transactional
     public ResponseReplyDto delete(Long replyId, CustomUserDetails customUserDetails) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
@@ -100,8 +101,9 @@ public class ReplyService {
     }
 
     /**
-    * 댓글 hard 삭제
+     * 댓글 hard 삭제
      */
+    @Transactional
     public void deleteHard(Long replyId, CustomUserDetails customUserDetails) {
         boolean isAdmin = customUserDetails.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
@@ -132,6 +134,7 @@ public class ReplyService {
     /**
      * 댓글 채택
      */
+    @Transactional
     public boolean selectReply(Long replyId, CustomUserDetails CustomUserDetails) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
@@ -153,8 +156,9 @@ public class ReplyService {
     }
 
     /**
-    * 댓글 추천 누르기
+     * 댓글 추천 누르기
      */
+    @Transactional
     public VoteType voteReply(Long replyId, CustomUserDetails CustomUserDetails) {
         User voteUser = userRepository.findById(CustomUserDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
@@ -182,6 +186,7 @@ public class ReplyService {
     /**
      * 댓글 비추천 누르기
      */
+    @Transactional
     public VoteType downVoteReply(Long replyId, CustomUserDetails CustomUserDetails) {
         User voteUser =userRepository.findById(CustomUserDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
@@ -207,4 +212,5 @@ public class ReplyService {
             return VoteType.DOWN;
         }
     }
+
 }

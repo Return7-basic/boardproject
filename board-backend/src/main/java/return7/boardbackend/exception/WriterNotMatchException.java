@@ -1,4 +1,4 @@
-package return7.boardbackend.errors;
+package return7.boardbackend.exception;
 /**
  * 예외처리 - 유저 수정,삭제 권한이 없을 떄
  */
