@@ -15,9 +15,5 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<Reply> findByBoardIdAndIdLessThanOrderByIdDesc(Long boardId, Long cursorId, Pageable pageable);
 
-
-    /**
-     * 보드ID 기준 채택된 댓글만 조회
-     */
     Optional<Reply> findByBoardIdAndIsSelectedTrue(Long boardId);
 }
