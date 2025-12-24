@@ -7,6 +7,7 @@ import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.exception.BoardNotFoundException;
+import return7.boardbackend.exception.NoAuthorityException;
 import return7.boardbackend.exception.UserNotFoundException;
 import return7.boardbackend.exception.WriterNotMatchException;
 import return7.boardbackend.repository.BoardRepository;
@@ -84,7 +85,7 @@ public class BoardService {
 
 
     /**
-     * 게시글 수정
+     * 게시글 삭제
      */
     @Transactional
     public void deleteBoard(Long boardId,Long loginUserId){
@@ -96,13 +97,24 @@ public class BoardService {
         }
         boardRepository.delete(board);
     }
-    /** 댓글 채택 여부 확인*/
-    
+    /**
+     * 관리자권한 게시글 삭제
+     */
     @Transactional
-    public void selectComment(Long boardId, Long commentId){
+    public void adminDeleteBoard(Long boardId, Long loginUserId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(()->new ReplyAlreadyAcceptedException(""))
-    }
+                .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
 
-    // admin 게시글 삭제 <= NoAuthorityException
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(() -> new UserNotFoundException("작성자를 찾을 수 없습니다."));
+
+        boolean isWriter = board.getWriter().getId().equals(user.getId());
+        boolean isAdmin = "ADMIN".equals(user.getAuthority());
+
+        if (!isWriter && !isAdmin) {
+            throw new NoAuthorityException("게시글 삭제 권한이 없습니다.");
+        }
+
+        boardRepository.delete(board);
+    }
 }
