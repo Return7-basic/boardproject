@@ -54,6 +54,14 @@ public class BoardController {
 
     }
 
-
+    //관리자 권한 삭제
+    @DeleteMapping("/{boardId}/admin")
+    public void adminDeleteBoard(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        Long loginUserId = customUserDetails.getUserId();
+        boardService.adminDeleteBoard(boardId, loginUserId);
+    }
 
 }
