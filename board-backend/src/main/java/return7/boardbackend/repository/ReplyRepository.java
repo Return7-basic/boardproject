@@ -1,10 +1,12 @@
 package return7.boardbackend.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import return7.boardbackend.entity.Reply;
 
-import java.util.List;
+import return7.boardbackend.entity.Reply;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findByBoardId(Long boardId);
@@ -13,4 +15,9 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<Reply> findByBoardIdAndIdLessThanOrderByIdDesc(Long boardId, Long cursorId, Pageable pageable);
 
+
+    /**
+     * 보드ID 기준 채택된 댓글만 조회
+     */
+    Optional<Reply> findByBoardIdAndIsSelectedTrue(Long boardId);
 }

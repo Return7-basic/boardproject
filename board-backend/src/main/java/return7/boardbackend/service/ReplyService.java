@@ -226,4 +226,17 @@ public class ReplyService {
         }
     }
 
+    /**
+     * 채택된 댓글만 조회
+     */
+    @Transactional(readOnly = true)
+    public ResponseReplyDto getSelectedReply(Long boardId) {
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardNotFoundException("게시물을 찾을 수 없습니다."));
+
+        Reply reply = replyRepository.findByBoardIdAndIsSelectedTrue(boardId)
+                .orElseThrow(() -> new ReplyNotFoundException("채택된 댓글이 없습니다."));
+
+        return ResponseReplyDto.from(reply);
+    }
 }

@@ -110,4 +110,12 @@ public class ReplyController {
     ) {
         return ResponseEntity.ok(replyService.downVoteReply(replyId, customUserDetails));
     }
+    
+    /**
+     * 채택된 댓글 조회 - boardId
+     */
+    @GetMapping("/selected")
+    public ResponseEntity<ResponseReplyDto> getSelectedReply (@PathVariable Long boardId) {
+        return ResponseEntity.ok(replyService.getSelectedReply(boardId));
+    }
 }
