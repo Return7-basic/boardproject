@@ -1,4 +1,4 @@
-package return7.boardbackend.security;
+package return7.boardbackend.security.principal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByLoginId(id)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다 loginID :: " + id));
 
-        return new CustomUserDetails(user);
+        return new CustomPrincipal(user);
     }
 }
