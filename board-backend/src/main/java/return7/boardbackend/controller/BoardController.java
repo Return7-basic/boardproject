@@ -65,6 +65,7 @@ public class BoardController {
         Long loginUserId = customUserDetails.getUserId();
         boardService.adminDeleteBoard(boardId, loginUserId);
     }
+
     /** 게시글 댓글 채택*/
     @PostMapping("/{boardId}/replies/{replyId}/select")
     public ResponseEntity<String> selectReply(
