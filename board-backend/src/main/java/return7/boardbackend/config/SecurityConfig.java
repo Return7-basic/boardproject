@@ -3,6 +3,7 @@ package return7.boardbackend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,26 +31,33 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/login/**",
-                                "/oauth2/**",
-                                "/api/public/**").permitAll()
 
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasRole("USER")
+                        //비로그인 허용 - 조회만 가능
+                        .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
 
+                        //로그인 페이지 OAuth
+                        .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
+
+                        //로그인 사용자
+                        .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/boards/**").hasRole("USER")
+
+                        //관리자 게시글 삭제
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/**").hasRole("ADMIN")
+
+                        //그 외 모든 요청 로그인 필요
                         .anyRequest().authenticated()
                 )
 
 
-                /** 자체 로그인 */
+                // 자체 로그인
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .usernameParameter("loginId")
                         .passwordParameter("password"))
 
-                /** oauth2 로그인 (Google, Naver, Kakao)*/
+                // oauth2 로그인 (Google, Naver, Kakao)
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)
                         )
@@ -63,12 +71,12 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                 )
 
-                .userDetailsService(userDetailsService);;
+                .userDetailsService(userDetailsService);
         return httpSecurity.build();
     }
 
-    /** CORS 설정*/
-    @Bean//frontend작업 시 변경 예정
+    // CORS 설정 (frontend작업 시 수정 예정)
+    @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
