@@ -25,7 +25,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 , oAuth2User.getAttributes());
 
         // user정보를 oauth2info를 통해 받아오거나 저장
-        User user = userRepository.findByLoginId(oauthUserInfo.getName()).orElse(null);
+        User user = userRepository.findByNickName(oauthUserInfo.getName()).orElse(null);
 
         return new CustomPrincipal(user, oAuth2User.getAttributes());
     }
