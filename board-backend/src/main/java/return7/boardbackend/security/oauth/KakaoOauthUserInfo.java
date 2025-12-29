@@ -1,6 +1,7 @@
 package return7.boardbackend.security.oauth;
 
 import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("unchecked")
 public class KakaoOauthUserInfo implements OauthUserInfo {
@@ -8,6 +9,8 @@ public class KakaoOauthUserInfo implements OauthUserInfo {
     private final Object id;
     private final Map<String, Object> kakaoAccount;
     private final Map<String, Object> profile;
+
+    private String nickname = "user_" + UUID.randomUUID().toString().substring(0,5);
 
     public KakaoOauthUserInfo(Map<String, Object> attributes) {
         this.id = attributes.get("id");
@@ -34,7 +37,10 @@ public class KakaoOauthUserInfo implements OauthUserInfo {
 
     @Override
     public String getName() {
-        return (String) profile.get("nickname");
+        if (profile.get("nickname") != null) {
+            return (String) profile.get("nickname");
+        }
+        return nickname;
     }
 }
 

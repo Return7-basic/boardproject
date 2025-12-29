@@ -1,6 +1,7 @@
 package return7.boardbackend.security.oauth;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class GoogleOauthUserInfo implements OauthUserInfo{
     private final Map<String, Object> attributes;
@@ -8,6 +9,8 @@ public class GoogleOauthUserInfo implements OauthUserInfo{
     public GoogleOauthUserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
+
+    private String nickname = "user_" + UUID.randomUUID().toString().substring(0,5);
 
     @Override
     public String getProvider() {
@@ -27,6 +30,9 @@ public class GoogleOauthUserInfo implements OauthUserInfo{
 
     @Override
     public String getName() {
-        return (String) attributes.get("name");
+        if (attributes.get("name") != null) {
+            return (String) attributes.get("name");
+        }
+        return nickname;
     }
 }
