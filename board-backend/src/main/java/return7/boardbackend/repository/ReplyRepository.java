@@ -15,7 +15,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<Reply> findByBoardIdOrderByIdDesc(Long boardId, Pageable pageable);
 
-    List<Reply> findByBoardIdOrderByRecommendationDescAndIdDesc(Long boardId, Pageable pageable);
+    List<Reply> findByBoardIdOrderByRecommendationDescIdDesc(Long boardId, Pageable pageable);
 
     List<Reply> findByBoardIdAndIdLessThanOrderByIdDesc(Long boardId, Long cursorId, Pageable pageable);
 
