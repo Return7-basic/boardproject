@@ -25,10 +25,10 @@ public class BoardVoteService {
      * 추천 비추천 적용
      */
     @Transactional
-    public void vote(Long boardId, String loginId, VoteType type) {
+    public void vote(Long boardId, Long userId, VoteType type) {
 
         // 사용자 조회
-        User user = userRepository.findByLoginId(loginId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("사용자 없음"));
 
         // 게시글 조회
