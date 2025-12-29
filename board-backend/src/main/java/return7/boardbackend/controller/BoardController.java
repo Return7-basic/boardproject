@@ -42,9 +42,9 @@ public class BoardController {
     public void updateBoard(
             @PathVariable Long boardId,
             @RequestBody BoardDto dto,
-            @AuthenticationPrincipal CustomPrincipal customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customPrincipal
             ){
-        Long loginUserId = customUserDetails.getUserId();
+        Long loginUserId = customPrincipal.getUserId();
         boardService.updateBoard(boardId,dto,loginUserId);
     }
 
@@ -60,9 +60,9 @@ public class BoardController {
     @DeleteMapping("/{boardId}/admin")
     public void adminDeleteBoard(
             @PathVariable Long boardId,
-            @AuthenticationPrincipal CustomPrincipal customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        Long loginUserId = customUserDetails.getUserId();
+        Long loginUserId = customPrincipal.getUserId();
         boardService.adminDeleteBoard(boardId, loginUserId);
     }
 
