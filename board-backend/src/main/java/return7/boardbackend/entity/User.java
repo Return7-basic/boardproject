@@ -47,13 +47,13 @@ public class User {
     private List<Reply> replies = new ArrayList<>();
 
     /** 비밀번호 변경 */
-    public void updatePassword(String newPassword){
+    public void changePassword(String newPassword){
         this.password=newPassword;
         this.updatedAt=LocalDateTime.now();
     }
 
     /** 닉네임 변경*/
-    public void updateNickName(String newNickName){
+    public void changeNickName(String newNickName){
         this.nickName=newNickName;
         this.updatedAt=LocalDateTime.now();
     }

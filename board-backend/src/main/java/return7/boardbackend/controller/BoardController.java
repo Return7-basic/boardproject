@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.BoardService;
@@ -50,21 +51,14 @@ public class BoardController {
 
     /**게시글 삭제*/
     @DeleteMapping("/{boardId}")
-    public void deleteBoard(@PathVariable Long boardId){
-        Long loginuserId=1L;
-        boardService.deleteBoard(boardId,loginuserId);
+    public ResponseEntity<Void> deleteBoard(@PathVariable Long boardId,
+        @AuthenticationPrincipal CustomPrincipal principal){
+        boardService.deleteBoard(boardId,principal.getUserId());
+        return ResponseEntity.noContent().build();
 
     }
 
-    /** 관리자 권한 삭제 */
-    @DeleteMapping("/{boardId}/admin")
-    public void adminDeleteBoard(
-            @PathVariable Long boardId,
-            @AuthenticationPrincipal CustomPrincipal customPrincipal
-    ) {
-        Long loginUserId = customPrincipal.getUserId();
-        boardService.adminDeleteBoard(boardId, loginUserId);
-    }
+
 
     /** 게시글 댓글 채택*/
     @PostMapping("/{boardId}/replies/{replyId}/select")

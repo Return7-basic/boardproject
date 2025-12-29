@@ -57,9 +57,10 @@ public class SecurityConfig {
                 )
 
                 .logout(logout -> logout
+                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONED")
+                        .deleteCookies("JSESSIONID")
                 )
 
                 .userDetailsService(userDetailsService);;
@@ -67,7 +68,7 @@ public class SecurityConfig {
     }
 
     /** CORS 설정*/
-    @Bean
+    @Bean//frontend작업 시 변경 예정
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
@@ -85,5 +86,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
