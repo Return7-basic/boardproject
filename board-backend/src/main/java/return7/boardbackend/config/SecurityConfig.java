@@ -3,7 +3,6 @@ package return7.boardbackend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import return7.boardbackend.security.CustomOauthSuccessHandler;
 import return7.boardbackend.security.principal.CustomOAuth2UserService;
 import return7.boardbackend.security.principal.CustomUserDetailsService;
 
@@ -25,7 +23,6 @@ import java.util.List;
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomOauthSuccessHandler customOauthSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -33,41 +30,30 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/login/**",
+                                "/oauth2/**",
+                                "/api/public/**").permitAll()
 
-                        //비로그인 허용 - 조회만 가능
-                        .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/boards/*/replies").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasRole("USER")
 
-                        //로그인 페이지 OAuth
-                        .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
-
-                        //USER 권한
-                        .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
-
-                        .requestMatchers(HttpMethod.POST, "/api/boards/*/replies/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/boards/*/replies/**").hasRole("USER")
-
-                        //ADMIN 권한
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/**").hasRole("ADMIN")
-                        //그 외 모든 요청 로그인 필요
                         .anyRequest().authenticated()
                 )
 
 
-                // 자체 로그인
+                /** 자체 로그인 */
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .usernameParameter("loginId")
                         .passwordParameter("password"))
 
-                // oauth2 로그인 (Google, Naver, Kakao)
+                /** oauth2 로그인 (Google, Naver, Kakao)*/
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)
                         )
-                        // .defaultSuccessUrl("/", true)
-                        .successHandler(customOauthSuccessHandler)
+                        .defaultSuccessUrl("/", true)
                 )
 
                 .logout(logout -> logout
@@ -77,12 +63,12 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                 )
 
-                .userDetailsService(userDetailsService);
+                .userDetailsService(userDetailsService);;
         return httpSecurity.build();
     }
 
-    // CORS 설정 (frontend작업 시 수정 예정)
-    @Bean
+    /** CORS 설정*/
+    @Bean//frontend작업 시 변경 예정
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 

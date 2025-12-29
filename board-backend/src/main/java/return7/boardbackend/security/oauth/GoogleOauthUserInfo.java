@@ -10,6 +10,7 @@ public class GoogleOauthUserInfo implements OauthUserInfo{
         this.attributes = attributes;
     }
 
+    private String nickname = "user_" + UUID.randomUUID().toString().substring(0,5);
 
     @Override
     public String getProvider() {
@@ -32,6 +33,6 @@ public class GoogleOauthUserInfo implements OauthUserInfo{
         if (attributes.get("name") != null) {
             return (String) attributes.get("name");
         }
-        return "";
+        return nickname;
     }
 }

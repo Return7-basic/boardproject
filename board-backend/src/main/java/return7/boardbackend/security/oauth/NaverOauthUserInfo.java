@@ -12,6 +12,9 @@ public class NaverOauthUserInfo implements OauthUserInfo {
         this.response = (Map<String, Object>) attributes.get("response");
     }
 
+    private String nickname = "user_" + UUID.randomUUID().toString().substring(0,5);
+
+
     @Override
     public String getProvider() {
         return "naver";
@@ -32,6 +35,6 @@ public class NaverOauthUserInfo implements OauthUserInfo {
         if (response.get("name") != null) {
             return (String) response.get("name");
         }
-        return "";
+        return nickname;
     }
 }
