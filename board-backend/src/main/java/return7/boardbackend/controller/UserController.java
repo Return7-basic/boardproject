@@ -25,7 +25,6 @@ public class UserController {
         return ResponseEntity.ok(userId);
     }
 
-
     /** 내 정보 조회 */
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(
@@ -52,6 +51,4 @@ public class UserController {
         userService.changePassword(principal.getUserId(),request);
         return ResponseEntity.noContent().build();
     }
-
-
 }
