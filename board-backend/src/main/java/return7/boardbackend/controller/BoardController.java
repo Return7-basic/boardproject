@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import return7.boardbackend.security.CustomUserDetails;
 import return7.boardbackend.dto.board.BoardDto;
+import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.BoardService;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class BoardController {
     public void updateBoard(
             @PathVariable Long boardId,
             @RequestBody BoardDto dto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customUserDetails
             ){
         Long loginUserId = customUserDetails.getUserId();
         boardService.updateBoard(boardId,dto,loginUserId);
@@ -60,7 +60,7 @@ public class BoardController {
     @DeleteMapping("/{boardId}/admin")
     public void adminDeleteBoard(
             @PathVariable Long boardId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customUserDetails
     ) {
         Long loginUserId = customUserDetails.getUserId();
         boardService.adminDeleteBoard(boardId, loginUserId);
