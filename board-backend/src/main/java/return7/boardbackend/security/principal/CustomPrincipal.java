@@ -22,6 +22,9 @@ public class CustomPrincipal implements UserDetails, OAuth2User {
         this.user = user;
         this.attributes = attributes;
     }
+    public Long getUserId() {
+        return user.getId();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
