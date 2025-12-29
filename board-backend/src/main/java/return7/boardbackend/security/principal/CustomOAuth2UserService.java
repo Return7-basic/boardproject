@@ -1,8 +1,12 @@
 package return7.boardbackend.security.principal;
 
+import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -51,31 +55,47 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 사용자가 없으면 새로 생성
         if (user == null) {
-            // 닉네임은 20자 제한을 고려하여 생성
-            String prevName = provider + "유저_";
-            int leftLength = 20 - prevName.length();
-            
-            String nextName = providerId;
-            if (nextName.length() > leftLength) {
-                nextName = providerId.substring(providerId.length() - leftLength);
+            // 신규 가입인 경우 세션에 속성값 저장
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                attributes.getRequest().getSession().setAttribute("isNewOAuthUser", true);
             }
-            
-            String nickName = prevName + nextName;
-            
-            // 랜덤 UUID 활용 비밀번호 지정
-            String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
+
+            UUID uuid = UUID.randomUUID();
+            // UUID를 Base64로 인코딩하여 닉네임 생성
+            String nickName = nickNameBase64(uuid);
+            // UUID 자체 비밀번호 지정
+            String encodedPassword = passwordEncoder.encode(uuid.toString());
 
             user = User.builder()
                     .loginId(loginId)
                     .password(encodedPassword)
                     .nickName(nickName)
                     .authority(Authority.USER)
-                    .email(oauthUserInfo.getEmail() != null ? oauthUserInfo.getEmail() : "이메일 없음") // null 가능성 있음
+                    .email(oauthUserInfo.getEmail())
                     .build();
 
             user = userRepository.save(user);
         }
 
         return user;
+    }
+
+    /**
+     * UUID를 Base64로 인코딩하여 닉네임 생성 (22자리 고정)
+     */
+    private String nickNameBase64(UUID uuid) {
+        
+        // 16byte 크기 버퍼 생성
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+
+        // UUID는 long 2개로 구성됨 (128bit)
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+
+        // Base64 인코딩
+        return Base64.getUrlEncoder()
+                     .withoutPadding()
+                     .encodeToString(buffer.array());
     }
 }

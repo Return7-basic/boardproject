@@ -10,8 +10,6 @@ public class KakaoOauthUserInfo implements OauthUserInfo {
     private final Map<String, Object> kakaoAccount;
     private final Map<String, Object> profile;
 
-    private String nickname = "user_" + UUID.randomUUID().toString().substring(0,5);
-
     public KakaoOauthUserInfo(Map<String, Object> attributes) {
         this.id = attributes.get("id");
         this.kakaoAccount =
@@ -40,7 +38,7 @@ public class KakaoOauthUserInfo implements OauthUserInfo {
         if (profile.get("nickname") != null) {
             return (String) profile.get("nickname");
         }
-        return nickname;
+        return "";
     }
 }
 

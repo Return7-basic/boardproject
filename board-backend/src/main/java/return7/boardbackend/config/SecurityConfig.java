@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import return7.boardbackend.security.CustomOauthSuccessHandler;
 import return7.boardbackend.security.principal.CustomOAuth2UserService;
 import return7.boardbackend.security.principal.CustomUserDetailsService;
 
@@ -24,6 +25,7 @@ import java.util.List;
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOauthSuccessHandler customOauthSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -61,7 +63,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)
                         )
-                        .defaultSuccessUrl("/", true)
+                        // .defaultSuccessUrl("/", true)
+                        .successHandler(customOauthSuccessHandler)
                 )
 
                 .logout(logout -> logout
