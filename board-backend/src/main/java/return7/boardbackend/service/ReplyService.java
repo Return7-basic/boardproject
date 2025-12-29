@@ -3,6 +3,8 @@ package return7.boardbackend.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.reply.RequestReplyDto;
@@ -20,6 +22,8 @@ import return7.boardbackend.repository.ReplyVoteRepository;
 import return7.boardbackend.repository.UserRepository;
 import return7.boardbackend.security.principal.CustomPrincipal;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +44,12 @@ public class ReplyService {
      * 댓글 작성
      */
     @Transactional
-    public ResponseReplyDto create(RequestReplyDto replyDto, CustomPrincipal customUserDetails) {
+    public ResponseReplyDto create(RequestReplyDto replyDto, Long userId) {
         Reply reply = Reply.builder()
                 .content(replyDto.getContent())
                 .board(boardRepository.findById(replyDto.getBoardId())
                         .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
-                .writer(userRepository.findById(customUserDetails.getUserId())
+                .writer(userRepository.findById(userId)
                         .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
                 .parent(replyRepository.findById(replyDto.getParentId())
                         .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다.")))
@@ -58,10 +62,10 @@ public class ReplyService {
      * 댓글 수정
      */
     @Transactional
-    public ResponseReplyDto update(ResponseReplyDto replyDto, CustomPrincipal CustomUserDetails) {
+    public ResponseReplyDto update(ResponseReplyDto replyDto, Long userId) {
         Reply reply = replyRepository.findById(replyDto.getId())
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
-        User loginUser = userRepository.findById(CustomUserDetails.getUserId())
+        User loginUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
         if (loginUser != reply.getWriter()) {
@@ -83,11 +87,11 @@ public class ReplyService {
      * 댓글 soft 삭제
      */
     @Transactional
-    public ResponseReplyDto delete(Long replyId, CustomPrincipal customUserDetails) {
+    public ResponseReplyDto delete(Long replyId, Long userId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
 
-        if (!reply.getWriter().getId().equals(customUserDetails.getUserId())) {
+        if (!reply.getWriter().getId().equals(userId)) {
             throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
         }
         // 추후 삭제 여부 고민
@@ -106,8 +110,8 @@ public class ReplyService {
      * 댓글 hard 삭제
      */
     @Transactional
-    public void deleteHard(Long replyId, CustomPrincipal customUserDetails) {
-        boolean isAdmin = customUserDetails.getAuthorities().stream()
+    public void deleteHard(Long replyId, Collection<? extends GrantedAuthority> authorities) {
+        boolean isAdmin = authorities.stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (!isAdmin) {
@@ -148,12 +152,12 @@ public class ReplyService {
      * 댓글 채택
      */
     @Transactional
-    public boolean selectReply(Long replyId, CustomPrincipal CustomUserDetails) {
+    public boolean selectReply(Long replyId, Long userId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         Board board = boardRepository.findById(reply.getBoard().getId())
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));;
-        User loginUser = userRepository.findById(CustomUserDetails.getUserId())
+        User loginUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
         if (loginUser != board.getWriter()) {
@@ -172,8 +176,8 @@ public class ReplyService {
      * 댓글 추천 누르기
      */
     @Transactional
-    public VoteType voteReply(Long replyId, CustomPrincipal CustomUserDetails) {
-        User voteUser = userRepository.findById(CustomUserDetails.getUserId())
+    public VoteType voteReply(Long replyId, Long userId) {
+        User voteUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply targetReply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
@@ -200,8 +204,8 @@ public class ReplyService {
      * 댓글 비추천 누르기
      */
     @Transactional
-    public VoteType downVoteReply(Long replyId, CustomPrincipal CustomUserDetails) {
-        User voteUser =userRepository.findById(CustomUserDetails.getUserId())
+    public VoteType downVoteReply(Long replyId, Long userId) {
+        User voteUser =userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply targetReply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
