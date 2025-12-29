@@ -27,13 +27,13 @@ public class UserService {
         if(userRepository.existsByLoginId(request.getLoginId())) {//loginId
             throw new UserAlreadyExistsException("이미 사용중인 ID입니다.");
         }
-        if(userRepository.existsByNickName(request.getNickName())) {//NickName
+        if(userRepository.existsByNickname(request.getNickname())) {//NickName
             throw new UserAlreadyExistsException("이미 사용중인 닉네임입니다.");
         }
         User user = User.builder()//password+builder
                 .loginId(request.getLoginId())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .nickName(request.getNickName())
+                .nickname(request.getNickname())
                 .email(request.getEmail())
                 .build();
 
@@ -61,7 +61,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
 
 
-        if(userRepository.existsByNickName(request.getNewNickname())){
+        if(userRepository.existsByNickname(request.getNewNickname())){
             throw new UserAlreadyExistsException("이미 사용중인 닉네임입니다.");
         }
         user.changeNickName(request.getNewNickname());

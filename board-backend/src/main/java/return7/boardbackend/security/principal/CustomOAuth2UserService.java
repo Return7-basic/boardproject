@@ -60,17 +60,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (attributes != null) {
                 attributes.getRequest().getSession().setAttribute("isNewOAuthUser", true);
             }
-
             UUID uuid = UUID.randomUUID();
             // UUID를 Base64로 인코딩하여 닉네임 생성
-            String nickName = nickNameBase64(uuid);
+            String nickname = nickNameBase64(uuid);
             // UUID 자체 비밀번호 지정
             String encodedPassword = passwordEncoder.encode(uuid.toString());
 
             user = User.builder()
                     .loginId(loginId)
                     .password(encodedPassword)
-                    .nickName(nickName)
+                    .nickname(nickname)
                     .authority(Authority.USER)
                     .email(oauthUserInfo.getEmail())
                     .build();
@@ -85,7 +84,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      * UUID를 Base64로 인코딩하여 닉네임 생성 (22자리 고정)
      */
     private String nickNameBase64(UUID uuid) {
-        
+
         // 16byte 크기 버퍼 생성
         ByteBuffer buffer = ByteBuffer.allocate(16);
 
