@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.reply.RequestReplyDto;
@@ -20,10 +19,8 @@ import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.ReplyVoteRepository;
 import return7.boardbackend.repository.UserRepository;
-import return7.boardbackend.security.principal.CustomPrincipal;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -137,7 +134,7 @@ public class ReplyService {
                     : replyRepository.findByBoardIdAndIdLessThanOrderByIdDesc(boardId, cursorId, pageable);
         } else {
             replies = (cursorId == null)
-                    ? replyRepository.findByBoardIdOrderByRecommendationDescAndIdDesc(boardId, pageable)
+                    ? replyRepository.findByBoardIdOrderByRecommendationDescIdDesc(boardId, pageable)
                     : replyRepository.findByBest(boardId,cursorScore, cursorId, pageable);
         }
 

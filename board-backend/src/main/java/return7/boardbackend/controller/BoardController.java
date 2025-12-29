@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.BoardService;
+import return7.boardbackend.service.ReplyService;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardController {
     private final BoardService boardService;
+    private final ReplyService replyService;
 
     /**게시글 작성*/
     @PostMapping
@@ -56,4 +58,5 @@ public class BoardController {
         return ResponseEntity.noContent().build();
 
     }
+
 }
