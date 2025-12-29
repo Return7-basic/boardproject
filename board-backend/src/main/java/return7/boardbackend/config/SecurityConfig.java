@@ -36,18 +36,21 @@ public class SecurityConfig {
 
                         //비로그인 허용 - 조회만 가능
                         .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/boards/*/replies").permitAll()
 
                         //로그인 페이지 OAuth
                         .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
 
-                        //로그인 사용자
+                        //USER 권한
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/boards/**").hasRole("USER")
 
-                        //관리자 게시글 삭제
+                        .requestMatchers(HttpMethod.POST, "/api/boards/*/replies/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/boards/*/replies/**").hasRole("USER")
+
+                        //ADMIN 권한
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/**").hasRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/**").hasRole("ADMIN")
                         //그 외 모든 요청 로그인 필요
                         .anyRequest().authenticated()
                 )
