@@ -9,6 +9,7 @@ import return7.boardbackend.dto.user.PasswordChangeRequest;
 import return7.boardbackend.dto.user.UserResponse;
 import return7.boardbackend.dto.user.UserSignupRequest;
 import return7.boardbackend.entity.User;
+import return7.boardbackend.exception.NicknameNotNullException;
 import return7.boardbackend.exception.NotMatchPasswordException;
 import return7.boardbackend.exception.UserAlreadyExistsException;
 import return7.boardbackend.exception.UserNotFoundException;
@@ -23,13 +24,13 @@ public class UserService {
 
     /**회원가입*/
     public Long signup(UserSignupRequest request) {
-        if(userRepository.existsByLoginId(request.getLoginId())) {
+        if(userRepository.existsByLoginId(request.getLoginId())) {//loginId
             throw new UserAlreadyExistsException("이미 사용중인 ID입니다.");
         }
-        if(userRepository.existsByNickName(request.getNickName())) {
+        if(userRepository.existsByNickName(request.getNickName())) {//NickName
             throw new UserAlreadyExistsException("이미 사용중인 닉네임입니다.");
         }
-        User user = User.builder()
+        User user = User.builder()//password+builder
                 .loginId(request.getLoginId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickName(request.getNickName())
@@ -48,33 +49,38 @@ public class UserService {
 
         return UserResponse.from(user);
 
-
     }
 
     /**닉네임 변경 */
     @Transactional
-    public void changeNickname(Long userId, NicknameChangeRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("유저가 존재하지 않습니다."));
+    public void changeNickname(Long userId, NicknameChangeRequest request) {//권한 검증 security
+        if(request.getNewNickname() ==null|| request.getNewNickname().isEmpty()){
+            throw new NicknameNotNullException("닉네임은 비어 있을 수 없습니다");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
 
-        if(userRepository.existsByNickName(request.getNewNickname())) {
+
+        if(userRepository.existsByNickName(request.getNewNickname())){
             throw new UserAlreadyExistsException("이미 사용중인 닉네임입니다.");
         }
-        user.updateNickName(request.getNewNickname());
+        user.changeNickName(request.getNewNickname());
     }
 
 
 
     /** 비밀번호 변경*/
-    @Transactional(readOnly = true)
-    public void changePassword(Long userId, PasswordChangeRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("유저가 존재하지 않습니다."));
+    @Transactional
+    public void changePassword(Long userId, PasswordChangeRequest request) {//User에서 정보 받아오기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
 
-        if(!passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 request.getCurrentPassword(),
                 user.getPassword())) {
             throw new NotMatchPasswordException("현재 비밀번호가 일치하지 않습니다.");
         }
-        passwordEncoder.encode(request.getNewPassword());
+        user.changePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
 }

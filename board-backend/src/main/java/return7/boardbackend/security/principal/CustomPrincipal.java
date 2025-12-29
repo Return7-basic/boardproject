@@ -43,6 +43,10 @@ public class CustomPrincipal implements UserDetails, OAuth2User {
         return attributes;
     }
 
+    public Long getUserId() {
+        return user.getId();
+    }
+
     // 식별자
     @Override
     public String getName() {
