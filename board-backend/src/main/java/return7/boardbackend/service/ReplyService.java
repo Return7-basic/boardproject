@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import return7.boardbackend.security.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
@@ -19,6 +18,7 @@ import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.ReplyVoteRepository;
 import return7.boardbackend.repository.UserRepository;
+import return7.boardbackend.security.principal.CustomPrincipal;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class ReplyService {
      * 댓글 작성
      */
     @Transactional
-    public ResponseReplyDto create(RequestReplyDto replyDto, CustomUserDetails customUserDetails) {
+    public ResponseReplyDto create(RequestReplyDto replyDto, CustomPrincipal customUserDetails) {
         Reply reply = Reply.builder()
                 .content(replyDto.getContent())
                 .board(boardRepository.findById(replyDto.getBoardId())
@@ -58,7 +58,7 @@ public class ReplyService {
      * 댓글 수정
      */
     @Transactional
-    public ResponseReplyDto update(ResponseReplyDto replyDto, CustomUserDetails CustomUserDetails) {
+    public ResponseReplyDto update(ResponseReplyDto replyDto, CustomPrincipal CustomUserDetails) {
         Reply reply = replyRepository.findById(replyDto.getId())
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         User loginUser = userRepository.findById(CustomUserDetails.getUserId())
@@ -83,7 +83,7 @@ public class ReplyService {
      * 댓글 soft 삭제
      */
     @Transactional
-    public ResponseReplyDto delete(Long replyId, CustomUserDetails customUserDetails) {
+    public ResponseReplyDto delete(Long replyId, CustomPrincipal customUserDetails) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
 
@@ -106,7 +106,7 @@ public class ReplyService {
      * 댓글 hard 삭제
      */
     @Transactional
-    public void deleteHard(Long replyId, CustomUserDetails customUserDetails) {
+    public void deleteHard(Long replyId, CustomPrincipal customUserDetails) {
         boolean isAdmin = customUserDetails.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
@@ -148,7 +148,7 @@ public class ReplyService {
      * 댓글 채택
      */
     @Transactional
-    public boolean selectReply(Long replyId, CustomUserDetails CustomUserDetails) {
+    public boolean selectReply(Long replyId, CustomPrincipal CustomUserDetails) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         Board board = boardRepository.findById(reply.getBoard().getId())
@@ -172,7 +172,7 @@ public class ReplyService {
      * 댓글 추천 누르기
      */
     @Transactional
-    public VoteType voteReply(Long replyId, CustomUserDetails CustomUserDetails) {
+    public VoteType voteReply(Long replyId, CustomPrincipal CustomUserDetails) {
         User voteUser = userRepository.findById(CustomUserDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply targetReply = replyRepository.findById(replyId)
@@ -200,7 +200,7 @@ public class ReplyService {
      * 댓글 비추천 누르기
      */
     @Transactional
-    public VoteType downVoteReply(Long replyId, CustomUserDetails CustomUserDetails) {
+    public VoteType downVoteReply(Long replyId, CustomPrincipal CustomUserDetails) {
         User voteUser =userRepository.findById(CustomUserDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply targetReply = replyRepository.findById(replyId)

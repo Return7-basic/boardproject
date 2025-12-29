@@ -5,11 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import return7.boardbackend.security.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
+import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.ReplyService;
 
 @RestController
@@ -27,7 +27,7 @@ public class ReplyController {
     @PostMapping
     public ResponseEntity<ResponseReplyDto> createReply(
             @RequestBody RequestReplyDto reqReplyDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customUserDetails
     ) {
         ResponseReplyDto resReplyDto = replyService.create(reqReplyDto, customUserDetails);
         return ResponseEntity.ok(resReplyDto);
@@ -39,7 +39,7 @@ public class ReplyController {
     @PatchMapping("/update")
     public ResponseEntity<ResponseReplyDto> updateReply(
             @RequestBody ResponseReplyDto replyDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+            @AuthenticationPrincipal CustomPrincipal customUserDetails) {
         ResponseReplyDto update = replyService.update(replyDto, customUserDetails);
         return ResponseEntity.ok(update);
     }
@@ -50,7 +50,7 @@ public class ReplyController {
     @PatchMapping("/softDelete")
     public ResponseEntity<ResponseReplyDto> softDeleteReply(
             @RequestBody RequestReplyDto replyDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+            @AuthenticationPrincipal CustomPrincipal customUserDetails) {
         ResponseReplyDto delete = replyService.delete(replyDto.getId(), customUserDetails);
         return ResponseEntity.ok(delete);
     }
@@ -61,7 +61,7 @@ public class ReplyController {
     @DeleteMapping("/{replyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReply(@PathVariable Long replyId,
-                            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                            @AuthenticationPrincipal CustomPrincipal customUserDetails) {
         replyService.deleteHard(replyId, customUserDetails);
     }
 
@@ -83,7 +83,7 @@ public class ReplyController {
     @PostMapping("/{replyId}/select")
     public ResponseEntity<Boolean> selectReply(
             @PathVariable Long replyId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customUserDetails
     ) {
         boolean result = replyService.selectReply(replyId, customUserDetails);
         return ResponseEntity.ok(result);
@@ -93,7 +93,7 @@ public class ReplyController {
      * 추천 누르기
      */
     @PostMapping("/{replyId}/up")
-    public ResponseEntity<VoteType> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<VoteType> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomPrincipal customUserDetails) {
         return ResponseEntity.ok(replyService.voteReply(replyId, customUserDetails));
     }
 
@@ -104,7 +104,7 @@ public class ReplyController {
     @PostMapping("/{replyId}/down")
     public ResponseEntity<VoteType> downVoteReply(
             @PathVariable Long replyId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customUserDetails
     ) {
         return ResponseEntity.ok(replyService.downVoteReply(replyId, customUserDetails));
     }
