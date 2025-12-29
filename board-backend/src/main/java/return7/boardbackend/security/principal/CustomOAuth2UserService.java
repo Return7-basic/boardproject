@@ -26,11 +26,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        String provider = userRequest.getClientRegistration().getRegistrationId();
-        OauthUserInfo oauthUserInfo = OauthUserInfoFactory.create(provider, oAuth2User.getAttributes());
+        OauthUserInfo oauthUserInfo = OauthUserInfoFactory.create(
+                userRequest.getClientRegistration().getRegistrationId(),
+                oAuth2User.getAttributes()
+            );
 
         // User 조회 또는 생성 (provider_providerId로 조회)
-        User user = getOrCreateUser(oauthUserInfo, provider);
+        User user = getOrCreateUser(oauthUserInfo);
 
         return new CustomPrincipal(user, oAuth2User.getAttributes());
     }
@@ -38,8 +40,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     /**
      * OAuth 사용자 정보를 이용해 User 생성 또는 조회
      */
-    private User getOrCreateUser(OauthUserInfo oauthUserInfo, String provider) {
-        String loginId = provider + "_" + oauthUserInfo.getProviderId();
+    private User getOrCreateUser(OauthUserInfo oauthUserInfo) {
+        String provider = oauthUserInfo.getProvider();
+        String providerId = oauthUserInfo.getProviderId();
+        String loginId = provider + "_" + providerId;
         
         // 닉네임 x - loginId로 조회
         User user = userRepository.findByLoginId(loginId).orElse(null);
@@ -47,15 +51,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 사용자가 없으면 새로 생성
         if (user == null) {
             // 닉네임은 20자 제한을 고려하여 생성
-            String providerPrefix = provider + "유저_";
-            int leftLength = 20 - providerPrefix.length();
+            String prevName = provider + "유저_";
+            int leftLength = 20 - prevName.length();
             
-            String providerId = oauthUserInfo.getProviderId();
-            if (providerId.length() > leftLength) {
-                providerId = providerId.substring(providerId.length() - leftLength);
+            String nextName = providerId;
+            if (nextName.length() > leftLength) {
+                nextName = providerId.substring(providerId.length() - leftLength);
             }
             
-            String nickName = providerPrefix + providerId;
+            String nickName = prevName + nextName;
             
             // 랜덤 UUID 활용 비밀번호 지정
             String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
