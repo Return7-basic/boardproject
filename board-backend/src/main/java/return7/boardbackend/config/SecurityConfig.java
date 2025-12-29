@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                 )
 
-                .userDetailsService(userDetailsService);;
+                .userDetailsService(userDetailsService);
         return httpSecurity.build();
     }
 

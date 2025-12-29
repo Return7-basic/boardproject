@@ -60,7 +60,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 nextName = providerId.substring(providerId.length() - leftLength);
             }
             
-            String nickName = prevName + nextName;
+            String nickname = prevName + nextName;
             
             // 랜덤 UUID 활용 비밀번호 지정
             String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
@@ -68,7 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = User.builder()
                     .loginId(loginId)
                     .password(encodedPassword)
-                    .nickName(nickName)
+                    .nickname(nickname)
                     .authority(Authority.USER)
                     .email(oauthUserInfo.getEmail() != null ? oauthUserInfo.getEmail() : "이메일 없음") // null 가능성 있음
                     .build();

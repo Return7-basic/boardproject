@@ -32,7 +32,7 @@ public class BoardDto {
                 .upCount(board.getUpCount())
                 .downCount(board.getDownCount())
                 .writerLoginId(board.getWriter().getLoginId())
-                .writerNickname(board.getWriter().getNickName())
+                .writerNickname(board.getWriter().getNickname())
                 .createdAt(board.getCreatedAt())
                 .build();
     }
