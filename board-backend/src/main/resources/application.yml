@@ -9,6 +9,19 @@ spring:
       ddl-auto: update
     show-sql: true
 
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 본인의-구글-이메일@gmail.com
+    password: 발급받은-앱-비밀번호 # 절대 일반 비밀번호 아님! (2단계 인증 후 발급)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   security:
     oauth2:
       client:

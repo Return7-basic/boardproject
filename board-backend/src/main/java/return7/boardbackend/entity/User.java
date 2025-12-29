@@ -24,7 +24,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, unique = true,length = 20)
+    @Column(nullable = false, unique = true,length = 30)
     private String nickName;//닉네임 중복x
 
     @Enumerated(EnumType.STRING)
