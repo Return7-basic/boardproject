@@ -1,0 +1,12 @@
+### 1. 회원가입 테스트
+POST http://localhost:8080/api/users/signup
+Content-Type: application/json
+
+{
+  "loginId": "test",
+  "password": "test1",
+  "nickname": "test",
+  "email": "test@test"
+}
+
+### 2. 로그인 테스트
