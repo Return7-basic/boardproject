@@ -11,7 +11,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //로그인,인증
     Optional<User> findByLoginId(String loginId);
 
-    Optional<User> findByNickName(String nickName);
+    Optional<User> findByNickname(String nickname);
 
     boolean existsByLoginId(String loginId);
 
