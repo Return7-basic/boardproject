@@ -1,3 +1,5 @@
+# --------------------------------------------------------------------------------------
+# 유저 테스트 (UserController)
 ### 1. 회원가입 테스트
 POST http://localhost:8080/api/users/signup
 Content-Type: application/json
@@ -10,3 +12,47 @@ Content-Type: application/json
 }
 
 ### 2. 로그인 테스트
+POST http://localhost:8080/login
+Content-Type: application/x-www-form-urlencoded
+
+loginId=test&password=test2
+
+### 3. 내정보 조회 테스트
+GET http://localhost:8080/api/users/me
+Content-Type: application/json
+
+### 4. 닉네임 변경 테스트
+PATCH http://localhost:8080/api/users/me/nickname
+Content-Type: application/json
+
+{
+  "newNickname": "newTest"
+}
+
+### 5. 비밀번호 변경 테스트
+PATCH http://localhost:8080/api/users/me/password
+Content-Type: application/json
+
+{
+  "currentPassword": "test1",
+  "newPassword": "test2"
+}
+
+### 6. 로그아웃 테스트
+POST http://localhost:8080/logout
+Content-Type: application/json
+
+# --------------------------------------------------------------------------------------
+# 보드 테스트 (BoardController)
+### 1. 게시글 작성
+POST http://localhost:8080/api/boards
+Content-Type: application/json
+
+{
+  "title": "테스트 게시글 1",
+  "content": "테스트 게시글 내용입니다."
+}
+
+### 2. 게시글 목록 조회 테스트
+GET http://localhost:8080/api/boards?page=0&size=10
+Content-Type: application/json

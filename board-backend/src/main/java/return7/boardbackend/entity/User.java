@@ -29,6 +29,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Authority authority=Authority.USER;
 
     @Column(name ="created_at")
