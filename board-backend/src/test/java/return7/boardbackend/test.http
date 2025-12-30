@@ -15,7 +15,7 @@ Content-Type: application/json
 POST http://localhost:8080/login
 Content-Type: application/x-www-form-urlencoded
 
-loginId=test&password=test2
+loginId=test&password=test1
 
 ### 3. 내정보 조회 테스트
 GET http://localhost:8080/api/users/me
