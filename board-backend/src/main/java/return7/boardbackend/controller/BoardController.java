@@ -19,8 +19,9 @@ public class BoardController {
 
     /**게시글 작성*/
     @PostMapping
-    public Long createBoard(@RequestBody BoardDto dto){
-       return boardService.createBoard(dto);
+    public Long createBoard(@RequestBody BoardDto dto, @AuthenticationPrincipal CustomPrincipal customPrincipal){
+
+       return boardService.createBoard(dto, customPrincipal.getUserId());
     }
 
     /**게시글 상세 조회(조회수 증가)*/

@@ -31,8 +31,8 @@ public class BoardService {
      * 게시글 생성
      */
     @Transactional
-    public Long createBoard(BoardDto boardDTO){
-        User writer = userRepository.findByLoginId(boardDTO.getWriterLoginId())
+    public Long createBoard(BoardDto boardDTO, Long userId){
+        User writer = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("작성자를 찾을 수 없습니다."));
 
         Board board = Board.builder()
