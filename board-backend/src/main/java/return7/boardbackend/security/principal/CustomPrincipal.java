@@ -38,7 +38,7 @@ public class CustomPrincipal implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return user.getNickName();
+        return user.getNickname();
     }
 
     @Override

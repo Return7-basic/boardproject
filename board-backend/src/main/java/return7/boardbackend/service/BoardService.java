@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.board.BoardDto;
+import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
@@ -107,12 +108,17 @@ public class BoardService {
 
     /** 게시글의 댓글 채택 */
     @Transactional
-    public void selectReply(Long boardId, Long replyId) {
+    public SelectedReplyDto selectReply(Long boardId, Long replyId, Long userId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다"));
-
+        User loginUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("댓글을 찾을 수 없습니다"));
+
+        if (loginUser != board.getWriter()) {
+            throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
+        }
 
         // 댓글이 해당 게시글의 것인지 확인
         if (!reply.getBoard().getId().equals(boardId)) {
@@ -122,5 +128,6 @@ public class BoardService {
         // 채택 처리
         board.selectReply(reply);
 
+        return new SelectedReplyDto(board.getSelectedReply().getId(), board.getSelectedReply().getContent());
     }
 }

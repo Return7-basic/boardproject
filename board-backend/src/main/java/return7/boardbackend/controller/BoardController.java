@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.BoardService;
+import return7.boardbackend.service.ReplyService;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardController {
     private final BoardService boardService;
+    private final ReplyService replyService;
 
     /**게시글 작성*/
     @PostMapping
@@ -56,17 +57,6 @@ public class BoardController {
         boardService.deleteBoard(boardId,principal.getUserId());
         return ResponseEntity.noContent().build();
 
-    }
-
-
-
-    /** 게시글 댓글 채택*/
-    @PostMapping("/{boardId}/replies/{replyId}/select")
-    public ResponseEntity<String> selectReply(
-            @PathVariable Long boardId,
-            @PathVariable Long replyId) {
-        boardService.selectReply(boardId, replyId);
-        return ResponseEntity.ok("댓글 채택됨.");
     }
 
 }
