@@ -44,6 +44,9 @@ public class SecurityConfig {
                         //회원가입 페이지
                         .requestMatchers("/api/users/signup").permitAll()
 
+                        //회원가입 페이지
+                        .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
+
                         //USER 권한
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
@@ -63,7 +66,8 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .usernameParameter("loginId")
-                        .passwordParameter("password"))
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/api/boards"))
 
                 // oauth2 로그인 (Google, Naver, Kakao)
                 .oauth2Login(oauth2 -> oauth2
