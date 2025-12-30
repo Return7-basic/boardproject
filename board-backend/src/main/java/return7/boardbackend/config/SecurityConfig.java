@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
 
                         //USER 권한
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")

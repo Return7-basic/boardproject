@@ -100,19 +100,24 @@ public class ReplyService {
     public ResponseReplyDto delete(Long replyId, Long userId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
+        ResponseReplyDto from = ResponseReplyDto.from(reply);
 
         if (!reply.getWriter().getId().equals(userId)) {
             throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
         }
-        // 추후 삭제 여부 고민
-        if (reply.isDeleted()) {
-            throw new AlreadyDeletedReplyException("이미 삭제된 댓글입니다.");
-        }
-        reply.setDeleted(true);
-        Reply saved = replyRepository.save(reply);
+        if (reply.getChildren().size() > 0) {
+            if (reply.isDeleted()) {
+                throw new AlreadyDeletedReplyException("이미 삭제된 댓글입니다.");
+            }
+            reply.setDeleted(true);
+            from = ResponseReplyDto.from(reply);
+            from.setContent("삭제된 댓글입니다.");
 
-        ResponseReplyDto from = ResponseReplyDto.from(saved);
-        from.setContent("삭제된 댓글입니다.");
+        }else {
+            replyRepository.delete(reply);
+            return null;
+        }
+
         return from;
     }
 
@@ -120,7 +125,7 @@ public class ReplyService {
      * 댓글 hard 삭제
      */
     @Transactional
-    public void deleteHard(Long replyId, Collection<? extends GrantedAuthority> authorities) {
+    public ResponseReplyDto deleteHard(Long replyId, Collection<? extends GrantedAuthority> authorities) {
         boolean isAdmin = authorities.stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
@@ -130,6 +135,7 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         replyRepository.delete(reply);
+        return null;
     }
 
     /**
@@ -215,18 +221,25 @@ public class ReplyService {
 
         Optional<ReplyVote> existVote = replyVoteRepository.findByReplyAndUser(targetReply, voteUser);
 
-        if (existVote.isPresent()){
+        // 이전값 여부 확인
+        if (existVote.isPresent()) {
             ReplyVote replyVote = existVote.get();
+            // 이미 추천된상태면 취소
             if (replyVote.isVoted()) {
                 replyVoteRepository.delete(replyVote);
+                targetReply.cancelVote(VoteType.UP);
                 return VoteType.CANCEL;
             }
             else {
+                // 비추천 -> 추천
                 replyVote.setVoted(true);
+                targetReply.changeVote(VoteType.DOWN, VoteType.UP);
                 return VoteType.UP;
             }
-        }else {
+        } else {
+            // 신규 선택시
             replyVoteRepository.save(new ReplyVote(voteUser, targetReply, true));
+            targetReply.applyVote(VoteType.UP);
             return VoteType.UP;
         }
     }
@@ -249,14 +262,17 @@ public class ReplyService {
             // 이미 비추천상태에서 클릭한 경우 취소처리
             if(!replyVote.isVoted()) {
                 replyVoteRepository.delete(replyVote);
+                targetReply.cancelVote(VoteType.DOWN);
                 return VoteType.CANCEL;
             } else {
                 // 추천상태에서 비추천으로 바꿈
                 replyVote.setVoted(false);
+                targetReply.changeVote(VoteType.UP, VoteType.DOWN);
                 return VoteType.DOWN;
             }
         } else {
             replyVoteRepository.save(new ReplyVote(voteUser, targetReply, false));
+            targetReply.applyVote(VoteType.DOWN);
             return VoteType.DOWN;
         }
     }

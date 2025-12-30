@@ -58,19 +58,19 @@ GET http://localhost:8080/api/boards?page=0&size=10
 Content-Type: application/json
 
 ### 3. 게시글 상세 조회
-GET http://localhost:8080/api/boards/2
+GET http://localhost:8080/api/boards/3
 Content-Type: application/json
 
 ### 4. 추천 기능 테스트
-POST http://localhost:8080/api/boards/1/up
+POST http://localhost:8080/api/boards/3/up
 Content-Type: application/json
 
 ### 5. 비추천 기능 테스트
-POST http://localhost:8080/api/boards/1/down
+POST http://localhost:8080/api/boards/3/down
 Content-Type: application/json
 
 ### 6. 댓글 달기 테스트
-POST http://localhost:8080/api/boards/1/replies
+POST http://localhost:8080/api/boards/3/replies
 Content-Type: application/json
 
 {
@@ -108,3 +108,53 @@ Content-Type: application/json
 {
   "title": "제목만 수정"
 }
+###
+# ------------------------------------------
+# 댓글 테스트 (Reply Test)
+### 3-1. 댓글 작성 (인증 필요)
+POST http://localhost:8080/api/boards/3/replies
+Content-Type: application/json
+
+{
+  "content": "댓글 내용입니다."
+}
+
+### 3-2. 대댓글 작성 (인증 필요)
+POST http://localhost:8080/api/boards/2/replies
+Content-Type: application/json
+
+{
+  "parentId": 2,
+  "content": "대댓글 내용입니다."
+}
+
+### 3-3. 댓글 조회
+GET http://localhost:8080/api/boards/3/replies?size=100&sort=latest
+
+### 3-4. 댓글 조회 (커서 기반 페이지네이션)
+GET http://localhost:8080/api/boards/1/replies?cursorId=10&size=20&sort=latest
+
+### 3-5. 댓글 수정 (인증 필요)
+PATCH http://localhost:8080/api/boards/1/replies/update
+Content-Type: application/json
+
+{
+  "id": 2,
+  "content": "수정된 댓글 내용입니다."
+}
+
+### 3-6. 댓글 삭제
+DELETE http://localhost:8080/api/boards/3/replies/2
+Content-Type: application/json
+
+### 3-8. 댓글 채택 (인증 필요)
+POST http://localhost:8080/api/boards/3/replies/1/select
+
+### 3-9. 댓글 추천 (인증 필요)
+POST http://localhost:8080/api/boards/3/replies/2/up
+
+### 3-10. 댓글 비추천 (인증 필요)
+POST http://localhost:8080/api/boards/3/replies/2/down
+
+### 3-11. 채택된 댓글 조회
+GET http://localhost:8080/api/boards/3/replies/selected

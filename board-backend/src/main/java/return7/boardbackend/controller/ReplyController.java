@@ -48,23 +48,29 @@ public class ReplyController {
     /**
      * soft 삭제
      */
-    @PatchMapping("/softDelete")
+    @DeleteMapping("/{replyId}")
     public ResponseEntity<ResponseReplyDto> softDeleteReply(
-            @RequestBody RequestReplyDto replyDto,
+            @PathVariable Long replyId,
             @AuthenticationPrincipal CustomPrincipal customPrincipal) {
-        ResponseReplyDto delete = replyService.delete(replyDto.getId(), customPrincipal.getUserId());
-        return ResponseEntity.ok(delete);
+
+        ResponseReplyDto delete = replyService.delete(replyId, customPrincipal.getUserId());
+
+        if(delete == null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(delete);
+        }
     }
 
     /**
      * hard 삭제
      */
-    @DeleteMapping("/{replyId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReply(@PathVariable Long replyId,
-                            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
-        replyService.deleteHard(replyId, customPrincipal.getAuthorities());
-    }
+//    @DeleteMapping("/{replyId}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteReply(@PathVariable Long replyId,
+//                            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+//        replyService.deleteHard(replyId, customPrincipal.getAuthorities());
+//    }
 
     /**
      * 전체 댓글 조회
