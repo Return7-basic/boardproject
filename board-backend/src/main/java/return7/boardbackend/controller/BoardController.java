@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardController {
     private final BoardService boardService;
-    private final ReplyService replyService;
 
     /**게시글 작성*/
     @PostMapping
