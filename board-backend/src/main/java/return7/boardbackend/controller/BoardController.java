@@ -55,7 +55,5 @@ public class BoardController {
         @AuthenticationPrincipal CustomPrincipal principal){
         boardService.deleteBoard(boardId,principal.getUserId());
         return ResponseEntity.noContent().build();
-
     }
-
 }

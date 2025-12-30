@@ -42,16 +42,28 @@ public class ReplyService {
      * 댓글 작성
      */
     @Transactional
-    public ResponseReplyDto create(RequestReplyDto replyDto, Long userId) {
-        Reply reply = Reply.builder()
-                .content(replyDto.getContent())
-                .board(boardRepository.findById(replyDto.getBoardId())
-                        .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
-                .writer(userRepository.findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
-                .parent(replyRepository.findById(replyDto.getParentId())
-                        .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다.")))
-                .build();
+    public ResponseReplyDto create(Long boardId, RequestReplyDto replyDto, Long userId) {
+        Reply reply = null;
+        if (replyDto.getParentId() == null) {
+            reply = Reply.builder()
+                    .content(replyDto.getContent())
+                    .board(boardRepository.findById(boardId)
+                            .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
+                    .writer(userRepository.findById(userId)
+                            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
+                    .build();
+        } else {
+            reply = Reply.builder()
+                    .content(replyDto.getContent())
+                    .board(boardRepository.findById(boardId)
+                            .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
+                    .writer(userRepository.findById(userId)
+                            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
+                    .parent(replyRepository.findById(replyDto.getParentId())
+                            // .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."))
+                            .orElse(null))
+                    .build();
+        }
         Reply saved = replyRepository.save(reply);
         return ResponseReplyDto.from(saved);
     }
@@ -170,7 +182,8 @@ public class ReplyService {
      * 댓글 채택
      */
     @Transactional
-    public boolean selectReply(Long replyId, Long boardId, Long userId) {
+    public boolean
+    selectReply(Long replyId, Long boardId, Long userId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         Board board = boardRepository.findById(boardId)

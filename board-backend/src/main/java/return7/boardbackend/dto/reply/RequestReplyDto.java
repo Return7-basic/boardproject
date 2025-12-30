@@ -9,7 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RequestReplyDto {
     private Long id;
-    private Long boardId;
     private Long parentId;
     private String content;
 }

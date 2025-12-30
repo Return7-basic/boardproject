@@ -26,10 +26,11 @@ public class ReplyController {
      */
     @PostMapping
     public ResponseEntity<ResponseReplyDto> createReply(
+            @PathVariable Long boardId,
             @RequestBody RequestReplyDto reqReplyDto,
             @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        ResponseReplyDto resReplyDto = replyService.create(reqReplyDto, customPrincipal.getUserId());
+        ResponseReplyDto resReplyDto = replyService.create(boardId, reqReplyDto, customPrincipal.getUserId());
         return ResponseEntity.ok(resReplyDto);
     }
 
@@ -68,7 +69,7 @@ public class ReplyController {
     /**
      * 전체 댓글 조회
      */
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<SliceResponseDto> getReply(
             @PathVariable Long boardId,
             @RequestParam(required = false) Long cursorId,
@@ -88,9 +89,8 @@ public class ReplyController {
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        SelectedReplyDto selected = boardService.selectReply(boardId, replyId, customPrincipal.getUserId());
-        boolean result = replyService.selectReply(replyId, boardId, customPrincipal.getUserId());
-        return ResponseEntity.ok(result);
+        boolean selected = boardService.selectReply(boardId, replyId, customPrincipal.getUserId());
+        return ResponseEntity.ok(selected);
     }
 
     /**

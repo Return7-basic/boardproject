@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.board.BoardDto;
-import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
@@ -26,6 +25,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
+    private final ReplyService replyService;
 
     /**
      * 게시글 생성
@@ -81,10 +81,18 @@ public class BoardService {
         if(!board.getWriter().getId().equals(loginUserId)){//작성자만 수정가능하게.
             throw new WriterNotMatchException("수정 권한이 없습니다.");
         }
-        board.update(dto.getTitle(), dto.getContent());
+        String patchedTitle = board.getTitle();
+        String patchedContent = board.getContent();
 
+        if(dto.getTitle() != null) {
+            patchedTitle = dto.getTitle();
+        }
+        if(dto.getContent() != null) {
+            patchedContent = dto.getContent();
+        }
+
+        board.update(patchedTitle, patchedContent);
     }
-
 
     /**
      * 게시글 삭제
@@ -108,7 +116,7 @@ public class BoardService {
 
     /** 게시글의 댓글 채택 */
     @Transactional
-    public SelectedReplyDto selectReply(Long boardId, Long replyId, Long userId) {
+    public boolean selectReply(Long boardId, Long replyId, Long userId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다"));
         User loginUser = userRepository.findById(userId)
@@ -125,9 +133,9 @@ public class BoardService {
             throw new WriterNotMatchException("해당 게시글의 댓글이 아닙니다");
         }
 
-        // 채택 처리
+        boolean b = replyService.selectReply(replyId, boardId, userId);
         board.selectReply(reply);
 
-        return new SelectedReplyDto(board.getSelectedReply().getId(), board.getSelectedReply().getContent());
+        return b;
     }
 }

@@ -48,6 +48,9 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     private User writer;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<BoardVote> votes = new ArrayList<>();
+
     public void update(String title,String content){
         this.title=title;
         this.content=content;

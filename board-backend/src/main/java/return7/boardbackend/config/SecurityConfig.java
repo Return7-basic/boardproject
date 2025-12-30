@@ -50,13 +50,15 @@ public class SecurityConfig {
                         //USER 권한
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/boards/*/replies/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH, "/api/boards/*/replies/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/*").hasRole("USER")
 
                         //ADMIN 권한
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/**").hasRole("ADMIN")
+                        .requestMatchers("/api/**").hasRole("ADMIN")
+
                         //그 외 모든 요청 로그인 필요
                         .anyRequest().authenticated()
                 )
