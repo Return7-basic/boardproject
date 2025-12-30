@@ -30,7 +30,7 @@ public class BoardController {
         return boardService.findById(boardId);
     }
 
-    //게시글 목록 조회
+    /**게시글 목록 조회*/
     @GetMapping
     public List<BoardDto> getBoards(
             @RequestParam(defaultValue = "0")int page,//page=0 ->1페이지
