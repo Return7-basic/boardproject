@@ -1,6 +1,5 @@
 package return7.boardbackend.dto.user;
 
-
 import lombok.Builder;
 import lombok.Getter;
 import return7.boardbackend.entity.User;
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-/** 유저 정보 응답*/
 public class UserResponse {
     private Long id;
     private String loginId;

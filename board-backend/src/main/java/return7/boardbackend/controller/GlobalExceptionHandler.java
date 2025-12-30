@@ -40,7 +40,6 @@ public class GlobalExceptionHandler {
                 .body(e.getMessage());
     }
 
-
     @ExceptionHandler(ReplyNotFoundException.class)
     public ResponseEntity<String> replyNotFoundException(ReplyNotFoundException e) {
         return ResponseEntity
@@ -61,4 +60,24 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
+
+    @ExceptionHandler(NicknameNotNullException.class)
+    public ResponseEntity<String> nicknameNotNullException(NicknameNotNullException e){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+    @ExceptionHandler(NotMatchPasswordException.class)
+    public ResponseEntity<String> notMatchPasswordException(NotMatchPasswordException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<String> userAlreadyExistsException(UserAlreadyExistsException e) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
 }

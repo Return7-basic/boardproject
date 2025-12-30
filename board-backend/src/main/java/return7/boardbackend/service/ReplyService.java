@@ -33,11 +33,6 @@ public class ReplyService {
     private final UserRepository userRepository;
     private final ReplyVoteRepository replyVoteRepository;
 
-    // 진짜 삭제는 Admin만 <= 프론트에서 구현,
-    // 삭제는 msg를 댓글이 삭제되었다고 구현
-    // 댓글 추천 기능
-    // 댓글 채택 기능
-
     /**
      * 댓글 작성
      */
@@ -94,48 +89,42 @@ public class ReplyService {
     }
 
     /**
-     * 댓글 soft 삭제
+     * 댓글 soft & Hard 삭제
      */
     @Transactional
-    public ResponseReplyDto delete(Long replyId, Long userId) {
+    public ResponseReplyDto delete(
+            Long replyId,
+            Long userId,
+            Collection<? extends GrantedAuthority> authorities
+    ) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
-        ResponseReplyDto from = ResponseReplyDto.from(reply);
+        ResponseReplyDto from;
 
-        if (!reply.getWriter().getId().equals(userId)) {
-            throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
-        }
-        if (reply.getChildren().size() > 0) {
+        boolean isAdmin = authorities.stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isWriter = reply.getWriter().getId().equals(userId);
+
+        if (!reply.getChildren().isEmpty()) {
+            // soft 삭제 (자식 댓글이 있는 경우) - 해당 유저만 가능
+            if (!isWriter) {
+                throw new WriterNotMatchException("해당 권한이 없습니다.");
+            }
             if (reply.isDeleted()) {
                 throw new AlreadyDeletedReplyException("이미 삭제된 댓글입니다.");
             }
             reply.setDeleted(true);
             from = ResponseReplyDto.from(reply);
             from.setContent("삭제된 댓글입니다.");
-
+            return from;
         }else {
+            // hard 삭제 (자식 댓글이 없는 경우) - 관리자 또는 해당 유저 가능
+            if(!isAdmin && !isWriter) {
+                throw new NoAuthorityException("해당 권한이 없습니다.");
+            }
             replyRepository.delete(reply);
             return null;
         }
-
-        return from;
-    }
-
-    /**
-     * 댓글 hard 삭제
-     */
-    @Transactional
-    public ResponseReplyDto deleteHard(Long replyId, Collection<? extends GrantedAuthority> authorities) {
-        boolean isAdmin = authorities.stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new NoAuthorityException("권한이 없습니다.");
-        }
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
-        replyRepository.delete(reply);
-        return null;
     }
 
     /**
@@ -179,8 +168,6 @@ public class ReplyService {
             nextCursor = -1L;
             nextScore = null;
         }
-
-
         return new SliceResponseDto(dtoList, hasNext, nextCursor, nextScore);
     }
 

@@ -58,6 +58,4 @@ public class User {
         this.nickname=newNickname;
         this.updatedAt=LocalDateTime.now();
     }
-
-
 }

@@ -1,6 +1,5 @@
 package return7.boardbackend.security;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -30,8 +29,6 @@ public class CustomOauthSuccessHandler implements AuthenticationSuccessHandler {
             );
             return;
         }
-
-        // 액세스토큰, 리플래시토큰 미사용
         
         // 세션에서 신규 가입 여부 확인
         Boolean isNewUser = (Boolean) request.getSession().getAttribute("isNewOAuthUser");

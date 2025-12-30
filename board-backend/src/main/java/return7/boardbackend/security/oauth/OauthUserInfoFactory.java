@@ -15,6 +15,5 @@ public class OauthUserInfoFactory {
                     "지원되지 않는 Oauth 제공자" + provider
             );
         };
-
     }
 }

@@ -87,5 +87,4 @@ public class Board {
         this.selected=true;
         this.selectedReply=reply;
     }
-
 }

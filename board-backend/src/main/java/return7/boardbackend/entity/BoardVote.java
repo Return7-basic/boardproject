@@ -42,5 +42,4 @@ public class BoardVote {
     public void changeVote(VoteType voteType){
         this.voteType=voteType;
     }
-
 }
