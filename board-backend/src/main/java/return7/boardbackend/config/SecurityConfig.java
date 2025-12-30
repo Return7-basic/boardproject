@@ -40,6 +40,9 @@ public class SecurityConfig {
 
                         //로그인 페이지 OAuth
                         .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
+                        
+                        //회원가입 페이지
+                        .requestMatchers("/api/users/signup").permitAll()
 
                         //USER 권한
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
