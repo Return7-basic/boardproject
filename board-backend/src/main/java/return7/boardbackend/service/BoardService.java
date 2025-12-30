@@ -9,6 +9,7 @@ import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
+import return7.boardbackend.enums.Authority;
 import return7.boardbackend.exception.*;
 import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.ReplyRepository;
@@ -94,38 +95,24 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
 
-        if(!board.getWriter().getId().equals(loginUserId)){//작성자만 수정가능하게.
-            throw new WriterNotMatchException("삭제 권한이 없습니다.");
-        }
-        boardRepository.delete(board);
-    }
-    /**
-     * 관리자권한 게시글 삭제
-     */
-    @Transactional
-    public void adminDeleteBoard(Long boardId, Long loginUserId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
-
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(() -> new UserNotFoundException("작성자를 찾을 수 없습니다."));
+                .orElseThrow(()->new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
-        boolean isWriter = board.getWriter().getId().equals(user.getId());
-        boolean isAdmin = "ADMIN".equals(user.getAuthority());
+        boolean isWriter = board.getWriter().getId().equals(user.getId());//작성자인가?
+        boolean isAdmin = user.getAuthority() == Authority.ADMIN;//관리자인가?
 
-        if (!isWriter && !isAdmin) {
-            throw new NoAuthorityException("게시글 삭제 권한이 없습니다.");
+        if(!isWriter && !isAdmin){//작성자 혹은 관리자인지?
+            throw new NoAuthorityException("삭제 권한이 없습니다.");
         }
-
         boardRepository.delete(board);
     }
 
     /** 게시글의 댓글 채택 */
     @Transactional
-    public SelectedReplyDto selectReply(Long boardId, Long replyId, CustomUserDetails customUserDetails) {
+    public SelectedReplyDto selectReply(Long boardId, Long replyId, Long userId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다"));
-        User loginUser = userRepository.findById(customUserDetails.getUserId())
+        User loginUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("댓글을 찾을 수 없습니다"));

@@ -5,16 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
 import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.service.BoardService;
+import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.ReplyService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/boards/{boardId}/replies")
@@ -29,9 +27,9 @@ public class ReplyController {
     @PostMapping
     public ResponseEntity<ResponseReplyDto> createReply(
             @RequestBody RequestReplyDto reqReplyDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        ResponseReplyDto resReplyDto = replyService.create(reqReplyDto, customUserDetails);
+        ResponseReplyDto resReplyDto = replyService.create(reqReplyDto, customPrincipal.getUserId());
         return ResponseEntity.ok(resReplyDto);
     }
 
@@ -41,8 +39,8 @@ public class ReplyController {
     @PatchMapping("/update")
     public ResponseEntity<ResponseReplyDto> updateReply(
             @RequestBody ResponseReplyDto replyDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        ResponseReplyDto update = replyService.update(replyDto, customUserDetails);
+            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+        ResponseReplyDto update = replyService.update(replyDto, customPrincipal.getUserId());
         return ResponseEntity.ok(update);
     }
 
@@ -52,8 +50,8 @@ public class ReplyController {
     @PatchMapping("/softDelete")
     public ResponseEntity<ResponseReplyDto> softDeleteReply(
             @RequestBody RequestReplyDto replyDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        ResponseReplyDto delete = replyService.delete(replyDto.getId(), customUserDetails);
+            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+        ResponseReplyDto delete = replyService.delete(replyDto.getId(), customPrincipal.getUserId());
         return ResponseEntity.ok(delete);
     }
 
@@ -63,8 +61,8 @@ public class ReplyController {
     @DeleteMapping("/{replyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReply(@PathVariable Long replyId,
-                            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        replyService.deleteHard(replyId, customUserDetails);
+                            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+        replyService.deleteHard(replyId, customPrincipal.getAuthorities());
     }
 
     /**
@@ -88,10 +86,10 @@ public class ReplyController {
     public ResponseEntity<Boolean> selectReply(
             @PathVariable Long boardId,
             @PathVariable Long replyId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        SelectedReplyDto selected = boardService.selectReply(boardId, replyId, customUserDetails);
-        boolean result = replyService.selectReply(selected.getReplyId());
+        SelectedReplyDto selected = boardService.selectReply(boardId, replyId, customPrincipal.getUserId());
+        boolean result = replyService.selectReply(replyId, boardId, customPrincipal.getUserId());
         return ResponseEntity.ok(result);
     }
 
@@ -99,8 +97,8 @@ public class ReplyController {
      * 추천 누르기
      */
     @PostMapping("/{replyId}/up")
-    public ResponseEntity<VoteType> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        return ResponseEntity.ok(replyService.voteReply(replyId, customUserDetails));
+    public ResponseEntity<VoteType> voteReply(@PathVariable Long replyId, @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+        return ResponseEntity.ok(replyService.voteReply(replyId, customPrincipal.getUserId()));
     }
 
 
@@ -110,9 +108,9 @@ public class ReplyController {
     @PostMapping("/{replyId}/down")
     public ResponseEntity<VoteType> downVoteReply(
             @PathVariable Long replyId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        return ResponseEntity.ok(replyService.downVoteReply(replyId, customUserDetails));
+        return ResponseEntity.ok(replyService.downVoteReply(replyId, customPrincipal.getUserId()));
     }
     
     /**
