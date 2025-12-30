@@ -22,7 +22,7 @@ public class BoardController {
     public Long createBoard(@RequestBody BoardDto dto, @AuthenticationPrincipal CustomPrincipal customPrincipal){
        return boardService.createBoard(dto, customPrincipal.getUserId());
     }
-    
+
     /**게시글 상세 조회(조회수 증가)*/
     @GetMapping("/{boardId}")
     public BoardDto getBoard(@PathVariable Long boardId){
