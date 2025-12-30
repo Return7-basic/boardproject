@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import return7.boardbackend.entity.Reply;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
-    List<Reply> findByBoardId(Long boardId);
 
     List<Reply> findByBoardIdOrderByIdDesc(Long boardId, Pageable pageable);
 

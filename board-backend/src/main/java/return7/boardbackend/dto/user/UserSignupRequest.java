@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-/** 회원가입 요청Dto*/
 public class UserSignupRequest {
     private String loginId;
     private String password;

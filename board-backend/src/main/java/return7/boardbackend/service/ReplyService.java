@@ -33,25 +33,32 @@ public class ReplyService {
     private final UserRepository userRepository;
     private final ReplyVoteRepository replyVoteRepository;
 
-    // 진짜 삭제는 Admin만 <= 프론트에서 구현,
-    // 삭제는 msg를 댓글이 삭제되었다고 구현
-    // 댓글 추천 기능
-    // 댓글 채택 기능
-
     /**
      * 댓글 작성
      */
     @Transactional
-    public ResponseReplyDto create(RequestReplyDto replyDto, Long userId) {
-        Reply reply = Reply.builder()
-                .content(replyDto.getContent())
-                .board(boardRepository.findById(replyDto.getBoardId())
-                        .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
-                .writer(userRepository.findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
-                .parent(replyRepository.findById(replyDto.getParentId())
-                        .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다.")))
-                .build();
+    public ResponseReplyDto create(Long boardId, RequestReplyDto replyDto, Long userId) {
+        Reply reply = null;
+        if (replyDto.getParentId() == null) {
+            reply = Reply.builder()
+                    .content(replyDto.getContent())
+                    .board(boardRepository.findById(boardId)
+                            .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
+                    .writer(userRepository.findById(userId)
+                            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
+                    .build();
+        } else {
+            reply = Reply.builder()
+                    .content(replyDto.getContent())
+                    .board(boardRepository.findById(boardId)
+                            .orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다.")))
+                    .writer(userRepository.findById(userId)
+                            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다.")))
+                    .parent(replyRepository.findById(replyDto.getParentId())
+                            // .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."))
+                            .orElse(null))
+                    .build();
+        }
         Reply saved = replyRepository.save(reply);
         return ResponseReplyDto.from(saved);
     }
@@ -82,42 +89,42 @@ public class ReplyService {
     }
 
     /**
-     * 댓글 soft 삭제
+     * 댓글 soft & Hard 삭제
      */
     @Transactional
-    public ResponseReplyDto delete(Long replyId, Long userId) {
+    public ResponseReplyDto delete(
+            Long replyId,
+            Long userId,
+            Collection<? extends GrantedAuthority> authorities
+    ) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
+        ResponseReplyDto from;
 
-        if (!reply.getWriter().getId().equals(userId)) {
-            throw new WriterNotMatchException("권한이 없습니다."); // 에러 목록 추가사항
-        }
-        // 추후 삭제 여부 고민
-        if (reply.isDeleted()) {
-            throw new AlreadyDeletedReplyException("이미 삭제된 댓글입니다.");
-        }
-        reply.setDeleted(true);
-        Reply saved = replyRepository.save(reply);
-
-        ResponseReplyDto from = ResponseReplyDto.from(saved);
-        from.setContent("삭제된 댓글입니다.");
-        return from;
-    }
-
-    /**
-     * 댓글 hard 삭제
-     */
-    @Transactional
-    public void deleteHard(Long replyId, Collection<? extends GrantedAuthority> authorities) {
         boolean isAdmin = authorities.stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isWriter = reply.getWriter().getId().equals(userId);
 
-        if (!isAdmin) {
-            throw new NoAuthorityException("권한이 없습니다.");
+        if (!reply.getChildren().isEmpty()) {
+            // soft 삭제 (자식 댓글이 있는 경우) - 해당 유저만 가능
+            if (!isWriter) {
+                throw new WriterNotMatchException("해당 권한이 없습니다.");
+            }
+            if (reply.isDeleted()) {
+                throw new AlreadyDeletedReplyException("이미 삭제된 댓글입니다.");
+            }
+            reply.setDeleted(true);
+            from = ResponseReplyDto.from(reply);
+            from.setContent("삭제된 댓글입니다.");
+            return from;
+        }else {
+            // hard 삭제 (자식 댓글이 없는 경우) - 관리자 또는 해당 유저 가능
+            if(!isAdmin && !isWriter) {
+                throw new NoAuthorityException("해당 권한이 없습니다.");
+            }
+            replyRepository.delete(reply);
+            return null;
         }
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
-        replyRepository.delete(reply);
     }
 
     /**
@@ -161,8 +168,6 @@ public class ReplyService {
             nextCursor = -1L;
             nextScore = null;
         }
-
-
         return new SliceResponseDto(dtoList, hasNext, nextCursor, nextScore);
     }
 
@@ -170,7 +175,8 @@ public class ReplyService {
      * 댓글 채택
      */
     @Transactional
-    public boolean selectReply(Long replyId, Long boardId, Long userId) {
+    public boolean
+    selectReply(Long replyId, Long boardId, Long userId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("답글을 찾을 수 없습니다."));
         Board board = boardRepository.findById(boardId)
@@ -202,18 +208,25 @@ public class ReplyService {
 
         Optional<ReplyVote> existVote = replyVoteRepository.findByReplyAndUser(targetReply, voteUser);
 
-        if (existVote.isPresent()){
+        // 이전값 여부 확인
+        if (existVote.isPresent()) {
             ReplyVote replyVote = existVote.get();
+            // 이미 추천된상태면 취소
             if (replyVote.isVoted()) {
                 replyVoteRepository.delete(replyVote);
+                targetReply.cancelVote(VoteType.UP);
                 return VoteType.CANCEL;
             }
             else {
+                // 비추천 -> 추천
                 replyVote.setVoted(true);
+                targetReply.changeVote(VoteType.DOWN, VoteType.UP);
                 return VoteType.UP;
             }
-        }else {
+        } else {
+            // 신규 선택시
             replyVoteRepository.save(new ReplyVote(voteUser, targetReply, true));
+            targetReply.applyVote(VoteType.UP);
             return VoteType.UP;
         }
     }
@@ -236,14 +249,17 @@ public class ReplyService {
             // 이미 비추천상태에서 클릭한 경우 취소처리
             if(!replyVote.isVoted()) {
                 replyVoteRepository.delete(replyVote);
+                targetReply.cancelVote(VoteType.DOWN);
                 return VoteType.CANCEL;
             } else {
                 // 추천상태에서 비추천으로 바꿈
                 replyVote.setVoted(false);
+                targetReply.changeVote(VoteType.UP, VoteType.DOWN);
                 return VoteType.DOWN;
             }
         } else {
             replyVoteRepository.save(new ReplyVote(voteUser, targetReply, false));
+            targetReply.applyVote(VoteType.DOWN);
             return VoteType.DOWN;
         }
     }

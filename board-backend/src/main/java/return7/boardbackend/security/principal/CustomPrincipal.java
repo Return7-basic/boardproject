@@ -28,10 +28,6 @@ public class CustomPrincipal implements UserDetails, OAuth2User {
         return user.getId();
     }
 
-    public String getUserLoginId() {
-        return user.getLoginId();
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getAuthority()));

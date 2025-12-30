@@ -1,13 +1,11 @@
 package return7.boardbackend.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
-import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
 import return7.boardbackend.service.BoardService;
@@ -26,10 +24,11 @@ public class ReplyController {
      */
     @PostMapping
     public ResponseEntity<ResponseReplyDto> createReply(
+            @PathVariable Long boardId,
             @RequestBody RequestReplyDto reqReplyDto,
             @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        ResponseReplyDto resReplyDto = replyService.create(reqReplyDto, customPrincipal.getUserId());
+        ResponseReplyDto resReplyDto = replyService.create(boardId, reqReplyDto, customPrincipal.getUserId());
         return ResponseEntity.ok(resReplyDto);
     }
 
@@ -45,30 +44,28 @@ public class ReplyController {
     }
 
     /**
-     * soft 삭제
-     */
-    @PatchMapping("/softDelete")
-    public ResponseEntity<ResponseReplyDto> softDeleteReply(
-            @RequestBody RequestReplyDto replyDto,
-            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
-        ResponseReplyDto delete = replyService.delete(replyDto.getId(), customPrincipal.getUserId());
-        return ResponseEntity.ok(delete);
-    }
-
-    /**
-     * hard 삭제
+     * 댓글 soft & hard 삭제
+     * - soft 삭제시 : Dto 전달
+     * - hard 삭제시 : 본문 응답없음
      */
     @DeleteMapping("/{replyId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReply(@PathVariable Long replyId,
-                            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
-        replyService.deleteHard(replyId, customPrincipal.getAuthorities());
+    public ResponseEntity<ResponseReplyDto> softDeleteReply(
+            @PathVariable Long replyId,
+            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+
+        ResponseReplyDto delete = replyService.delete(replyId, customPrincipal.getUserId(), customPrincipal.getAuthorities());
+
+        if(delete == null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(delete);
+        }
     }
 
     /**
      * 전체 댓글 조회
      */
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<SliceResponseDto> getReply(
             @PathVariable Long boardId,
             @RequestParam(required = false) Long cursorId,
@@ -88,9 +85,8 @@ public class ReplyController {
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        SelectedReplyDto selected = boardService.selectReply(boardId, replyId, customPrincipal.getUserId());
-        boolean result = replyService.selectReply(replyId, boardId, customPrincipal.getUserId());
-        return ResponseEntity.ok(result);
+        boolean selected = boardService.selectReply(boardId, replyId, customPrincipal.getUserId());
+        return ResponseEntity.ok(selected);
     }
 
     /**

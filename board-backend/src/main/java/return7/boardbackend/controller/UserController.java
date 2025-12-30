@@ -18,13 +18,12 @@ import return7.boardbackend.service.UserService;
 public class UserController {
     private final UserService userService;
 
-    /** 회원가입*/
+    /** 회원가입 */
     @PostMapping("/signup")
     public ResponseEntity<Long> signup(@RequestBody UserSignupRequest request){
         Long userId=userService.signup(request);
         return ResponseEntity.ok(userId);
     }
-
 
     /** 내 정보 조회 */
     @GetMapping("/me")
@@ -33,7 +32,7 @@ public class UserController {
      return ResponseEntity.ok(UserResponse.from(user));
     }
 
-    //닉네임 변경
+    /** 닉네임 변경 */
     @PatchMapping("/me/nickname")
     public ResponseEntity<Void> changeNickname(
             @AuthenticationPrincipal CustomPrincipal principal,
@@ -43,7 +42,7 @@ public class UserController {
         return ResponseEntity.noContent().build();//204 No Content
     }
 
-    //비밀번호 변경
+    /** 비밀번호 변경 */
     @PatchMapping("/me/password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal CustomPrincipal principal,

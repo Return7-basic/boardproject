@@ -2,6 +2,7 @@ package return7.boardbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import return7.boardbackend.enums.VoteType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,4 +49,28 @@ public class Reply {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> children = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.REMOVE)
+    private List<ReplyVote> votes = new ArrayList<>();
+
+    public void applyVote(VoteType type) {
+        if (type == VoteType.UP) {
+            recommendation++;
+        } else {
+            disrecommendation++;
+        }
+    }
+
+    public void cancelVote(VoteType type) {
+        if (type == VoteType.UP) {
+            recommendation--;
+        } else {
+            disrecommendation--;
+        }
+    }
+
+    public void changeVote(VoteType from, VoteType to) {
+        cancelVote(from);
+        applyVote(to);
+    }
 }

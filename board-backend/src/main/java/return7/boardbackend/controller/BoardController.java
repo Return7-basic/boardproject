@@ -17,19 +17,19 @@ import java.util.List;
 public class BoardController {
     private final BoardService boardService;
 
-    /**게시글 작성*/
+    /** 게시글 작성 */
     @PostMapping
     public Long createBoard(@RequestBody BoardDto dto, @AuthenticationPrincipal CustomPrincipal customPrincipal){
        return boardService.createBoard(dto, customPrincipal.getUserId());
     }
 
-    /**게시글 상세 조회(조회수 증가)*/
+    /** 게시글 상세 조회(조회수 증가) */
     @GetMapping("/{boardId}")
     public BoardDto getBoard(@PathVariable Long boardId){
         return boardService.findById(boardId);
     }
 
-    /**게시글 목록 조회*/
+    /** 게시글 목록 조회 */
     @GetMapping
     public List<BoardDto> getBoards(
             @RequestParam(defaultValue = "0")int page,//page=0 ->1페이지
@@ -38,7 +38,7 @@ public class BoardController {
         return boardService.findAll(page,size);
     }
 
-    /**게시글 수정*/
+    /** 게시글 수정 */
     @PutMapping("/{boardId}")
     public void updateBoard(
             @PathVariable Long boardId,
@@ -49,13 +49,11 @@ public class BoardController {
         boardService.updateBoard(boardId,dto,loginUserId);
     }
 
-    /**게시글 삭제*/
+    /** 게시글 삭제 */
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(@PathVariable Long boardId,
         @AuthenticationPrincipal CustomPrincipal principal){
         boardService.deleteBoard(boardId,principal.getUserId());
         return ResponseEntity.noContent().build();
-
     }
-
 }

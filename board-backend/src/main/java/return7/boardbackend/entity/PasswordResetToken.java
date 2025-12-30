@@ -16,7 +16,7 @@ public class PasswordResetToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private static final long EXPIRATION_MINUTES = 10L;
 
     @Column(nullable = false, unique = true)
@@ -28,7 +28,7 @@ public class PasswordResetToken {
 
     @Column(nullable = false)
     private LocalDateTime expiredAt;
-    
+
     public static PasswordResetToken create(User user){
         PasswordResetToken passwordResetToken = new PasswordResetToken();
         passwordResetToken.user = user;

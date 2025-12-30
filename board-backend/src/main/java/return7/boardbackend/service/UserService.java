@@ -26,7 +26,7 @@ public class UserService {
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
 
-    /**회원가입*/
+    /** 회원가입 */
     public Long signup(UserSignupRequest request) {
         if(userRepository.existsByLoginId(request.getLoginId())) {//loginId
             throw new UserAlreadyExistsException("이미 사용중인 ID입니다.");
@@ -46,7 +46,7 @@ public class UserService {
 
     }
 
-    /** 내 정보 조회*/
+    /** 내 정보 조회 */
     @Transactional(readOnly = true)
     public UserResponse getMyInfo(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("유저가 존재하지 않습니다"));
@@ -55,7 +55,7 @@ public class UserService {
 
     }
 
-    /**닉네임 변경 */
+    /** 닉네임 변경 */
     @Transactional
     public void changeNickname(Long userId, NicknameChangeRequest request) {//권한 검증 security
         if(request.getNewNickname() ==null|| request.getNewNickname().isEmpty()){
@@ -71,7 +71,7 @@ public class UserService {
         user.changeNickName(request.getNewNickname());
     }
 
-    /** 비밀번호 변경*/
+    /** 비밀번호 변경 */
     @Transactional
     public void changePassword(Long userId, PasswordChangeRequest request) {//User에서 정보 받아오기
         User user = userRepository.findById(userId)

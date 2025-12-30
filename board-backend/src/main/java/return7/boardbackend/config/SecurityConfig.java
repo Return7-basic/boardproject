@@ -7,8 +7,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -48,26 +46,28 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
 
                         //USER 권한
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/boards/*/replies/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH, "/api/boards/*/replies/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/*").hasRole("USER")
 
                         //ADMIN 권한
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/**").hasRole("ADMIN")
+                        .requestMatchers("/api/**").hasRole("ADMIN")
+
                         //그 외 모든 요청 로그인 필요
                         .anyRequest().authenticated()
                 )
-
 
                 // 자체 로그인
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .usernameParameter("loginId")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/api/boards"))
+                        .defaultSuccessUrl("/"))
 
                 // oauth2 로그인 (Google, Naver, Kakao)
                 .oauth2Login(oauth2 -> oauth2
