@@ -3,7 +3,6 @@ package return7.boardbackend.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import return7.boardbackend.config.CustomUserDetails;
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.entity.Board;
