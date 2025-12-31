@@ -13,6 +13,8 @@ import return7.boardbackend.repository.BoardRepository;
 import return7.boardbackend.repository.BoardVoteRepository;
 import return7.boardbackend.repository.UserRepository;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class BoardVoteService {
@@ -25,7 +27,7 @@ public class BoardVoteService {
      * 추천 비추천 적용
      */
     @Transactional
-    public void vote(Long boardId, Long userId, VoteType type) {
+    public Map<String, Integer> vote(Long boardId, Long userId, VoteType type) {
 
         // 사용자 조회
         User user = userRepository.findById(userId)
@@ -41,6 +43,12 @@ public class BoardVoteService {
                         existingVote -> handleExistingVote(existingVote, type, board),
                         () -> createNewVote(board, user, type)
                 );
+        
+        // 업데이트된 카운트 반환
+        return Map.of(
+                "upCount", board.getUpCount(),
+                "downCount", board.getDownCount()
+        );
     }
 
     /**

@@ -62,12 +62,30 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // 자체 로그인
+                // 자체 로그인 (SPA용 JSON 응답)
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .usernameParameter("loginId")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/"))
+                        .successHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":true}");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":false,\"message\":\"" + exception.getMessage() + "\"}");
+                        }))
+
+                // API 요청에 대해 401 JSON 응답 (로그인 페이지 리다이렉트 대신)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"로그인이 필요합니다.\"}");
+                        })
+                )
 
                 // oauth2 로그인 (Google, Naver, Kakao)
                 .oauth2Login(oauth2 -> oauth2
@@ -77,11 +95,17 @@ public class SecurityConfig {
                         .successHandler(customOauthSuccessHandler)
                 )
 
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":true}");
+                        })
                 )
 
                 .userDetailsService(userDetailsService);
