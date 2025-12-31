@@ -1,6 +1,7 @@
 package return7.boardbackend.security.oauth;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class GoogleOauthUserInfo implements OauthUserInfo{
     private final Map<String, Object> attributes;

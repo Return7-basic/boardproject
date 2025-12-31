@@ -22,7 +22,13 @@ export default function BoardList() {
   const [size] = useState(10);
   const { isLoggedIn } = useAuth();
   
-  const { data: boards, isLoading, isError, error } = useBoards(page, size);
+  // 정확히 size개만 요청 (백엔드에서 hasNext 정보 제공)
+  const { data: boardData, isLoading, isError, error } = useBoards(page, size);
+  
+  // 실제 표시할 게시글
+  const displayBoards = boardData?.items || [];
+  // 다음 페이지가 있는지 확인 (백엔드에서 제공)
+  const hasNextPage = boardData?.hasNext || false;
 
   // 로딩 상태
   if (isLoading) {
@@ -48,8 +54,8 @@ export default function BoardList() {
     );
   }
 
-  // 빈 목록
-  if (!boards || boards.length === 0) {
+  // 빈 목록 (page가 0이고 게시글이 없을 때만)
+  if (page === 0 && (!displayBoards || displayBoards.length === 0)) {
     return (
       <div>
         {/* 헤더 */}
@@ -112,7 +118,7 @@ export default function BoardList() {
 
       {/* 게시글 목록 */}
       <div className="space-y-3 mb-8">
-        {boards.map((board) => (
+        {displayBoards.map((board) => (
           <BoardCard key={board.id} board={board} />
         ))}
       </div>
@@ -137,7 +143,7 @@ export default function BoardList() {
           variant="ghost"
           size="sm"
           onClick={() => setPage(p => p + 1)}
-          disabled={boards.length < size}
+          disabled={!hasNextPage}
         >
           다음
           <ChevronRight size={18} />

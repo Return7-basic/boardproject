@@ -6,7 +6,7 @@ import api from '@/lib/axios';
  * @param {Object} params - { cursorId, size, sort, cursorScore }
  */
 export const getReplies = async (boardId, params = {}) => {
-  const { cursorId, size = 100, sort = 'latest', cursorScore } = params;
+  const { cursorId, size = 100, sort = 'ascending', cursorScore } = params;
   const response = await api.get(`/api/boards/${boardId}/replies`, {
     params: { cursorId, size, sort, cursorScore },
   });
@@ -18,8 +18,16 @@ export const getReplies = async (boardId, params = {}) => {
  * @param {number} boardId 
  */
 export const getSelectedReply = async (boardId) => {
-  const response = await api.get(`/api/boards/${boardId}/replies/selected`);
-  return response.data;
+  try {
+    const response = await api.get(`/api/boards/${boardId}/replies/selected`);
+    return response.data;
+  } catch (error) {
+    // 404 에러는 채택된 댓글이 없는 것이므로 null 반환
+    if (error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
 };
 
 /**

@@ -105,8 +105,13 @@ public class ReplyService {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isWriter = reply.getWriter().getId().equals(userId);
 
-        if (!reply.getChildren().isEmpty()) {
-            // soft 삭제 (자식 댓글이 있는 경우) - 해당 유저만 가능
+        // 삭제되지 않은 자식 댓글만 필터링
+        List<Reply> notDeletedChildren = reply.getChildren().stream()
+                .filter(child -> !child.isDeleted())
+                .toList();
+
+        if (!notDeletedChildren.isEmpty()) {
+            // soft 삭제 (삭제되지 않은 자식 댓글이 있는 경우) - 해당 유저만 가능
             if (!isWriter) {
                 throw new WriterNotMatchException("해당 권한이 없습니다.");
             }
@@ -117,14 +122,62 @@ public class ReplyService {
             from = ResponseReplyDto.from(reply);
             from.setContent("삭제된 댓글입니다.");
             return from;
-        }else {
-            // hard 삭제 (자식 댓글이 없는 경우) - 관리자 또는 해당 유저 가능
+        } else {
+            // hard 삭제 (삭제되지 않은 자식 댓글이 없는 경우) - 관리자 또는 해당 유저 가능
             if(!isAdmin && !isWriter) {
                 throw new NoAuthorityException("해당 권한이 없습니다.");
             }
+            
+            // 부모 댓글 ID 저장 (자식 댓글인 경우)
+            Long parentId = reply.getParent() != null ? reply.getParent().getId() : null;
+            
+            // 현재 댓글을 삭제
             replyRepository.delete(reply);
+            
+            // FE 작업중 수정 : 부모가 soft delete된 상태이고 모든 자식이 삭제되면 부모도 자동 hard delete
+            if (parentId != null) {
+                // 부모를 다시 조회하여 최신 상태 확인
+                Optional<Reply> parentOptional = replyRepository.findById(parentId);
+                if (parentOptional.isPresent()) {
+                    Reply parentReply = parentOptional.get();
+                    if (parentReply.isDeleted()) {
+                        // 부모의 삭제되지 않은 자식 개수 확인 (DB에서 직접 조회)
+                        long notDeletedChildrenCount = replyRepository.countByParentIdAndIsDeletedFalse(parentId);
+                        
+                        // 부모의 모든 자식이 삭제되었다면 부모도 hard delete
+                        if (notDeletedChildrenCount == 0) {
+                            replyRepository.delete(parentReply);
+                        }
+                    }
+                }
+            }
+            
             return null;
         }
+    }
+
+    // FE 작업중 수정 : Soft delete된 댓글들 정리 메서드 추가 (데이터 정리용)
+    /**
+     * Soft delete된 댓글들 중 자식이 모두 삭제된 댓글들을 완전히 삭제
+     * (데이터 정리용)
+     */
+    @Transactional
+    public int cleanupDeletedReplies() {
+        List<Reply> deletedReplies = replyRepository.findAllDeletedReplies();
+        int deletedCount = 0;
+        
+        for (Reply deletedReply : deletedReplies) {
+            // 삭제되지 않은 자식 확인
+            long notDeletedChildrenCount = replyRepository.countByParentIdAndIsDeletedFalse(deletedReply.getId());
+            
+            // 자식이 모두 삭제되었다면 완전히 삭제
+            if (notDeletedChildrenCount == 0) {
+                replyRepository.delete(deletedReply);
+                deletedCount++;
+            }
+        }
+        
+        return deletedCount;
     }
 
     /**
@@ -135,11 +188,19 @@ public class ReplyService {
         Pageable pageable = PageRequest.of(0, size +1);
         List<Reply> replies = new ArrayList<>();
 
+        // FE 작업중 수정 : 정렬 옵션 추가 (ascending: 기본순 오름차순, latest: 최신순 내림차순, 그 외: 추천순)
         if ("latest".equalsIgnoreCase(sort.trim())){
+            // 최신순 - 내림차순 (ID DESC)
             replies = (cursorId == null)
                     ? replyRepository.findByBoardIdOrderByIdDesc(boardId, pageable)
                     : replyRepository.findByBoardIdAndIdLessThanOrderByIdDesc(boardId, cursorId, pageable);
+        } else if ("ascending".equalsIgnoreCase(sort.trim())){
+            // 기본순 - 오름차순 (ID ASC)
+            replies = (cursorId == null)
+                    ? replyRepository.findByBoardIdOrderByIdAsc(boardId, pageable)
+                    : replyRepository.findByBoardIdAndIdGreaterThanOrderByIdAsc(boardId, cursorId, pageable);
         } else {
+            // 추천순 - 추천수 내림차순, ID 내림차순
             replies = (cursorId == null)
                     ? replyRepository.findByBoardIdOrderByRecommendationDescIdDesc(boardId, pageable)
                     : replyRepository.findByBest(boardId,cursorScore, cursorId, pageable);
@@ -155,13 +216,16 @@ public class ReplyService {
                 .map(ResponseReplyDto::from)
                 .toList();
 
+        // FE 작업중 수정 : nextScore는 추천순일 때만 설정하도록 로직 수정 (ascending 추가)
         Long nextCursor;
         Integer nextScore;
         if (!replies.isEmpty()) {
              nextCursor = replies.get(replies.size() - 1).getId();
-            if (!"latest".equalsIgnoreCase(sort.trim())) {
+            if (!"latest".equalsIgnoreCase(sort.trim()) && !"ascending".equalsIgnoreCase(sort.trim())) {
+                // 추천순인 경우에만 nextScore 설정
                 nextScore = replies.get(replies.size() - 1).getRecommendation();
             } else {
+                // 최신순 또는 기본순인 경우 nextScore는 null
                 nextScore = null;
             }
         } else {
@@ -264,17 +328,17 @@ public class ReplyService {
         }
     }
 
+    // FE 작업중 수정 : 반환 타입을 ResponseReplyDto에서 Optional<ResponseReplyDto>로 변경하여 채택된 댓글이 없을 때 404 처리 가능하도록 수정
     /**
      * 채택된 댓글만 조회
      */
     @Transactional(readOnly = true)
-    public ResponseReplyDto getSelectedReply(Long boardId) {
+    public Optional<ResponseReplyDto> getSelectedReply(Long boardId) {
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시물을 찾을 수 없습니다."));
 
-        Reply reply = replyRepository.findByBoardIdAndIsSelectedTrue(boardId)
-                .orElseThrow(() -> new ReplyNotFoundException("채택된 댓글이 없습니다."));
-
-        return ResponseReplyDto.from(reply);
+        Optional<Reply> replyOptional = replyRepository.findByBoardIdAndIsSelectedTrue(boardId);
+        
+        return replyOptional.map(ResponseReplyDto::from);
     }
 }

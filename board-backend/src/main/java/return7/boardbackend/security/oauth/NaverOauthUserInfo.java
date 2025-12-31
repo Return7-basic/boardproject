@@ -1,6 +1,7 @@
 package return7.boardbackend.security.oauth;
 
 import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("unchecked")
 public class NaverOauthUserInfo implements OauthUserInfo {

@@ -37,6 +37,7 @@ public class ReplyController {
      */
     @PatchMapping("/update")
     public ResponseEntity<ResponseReplyDto> updateReply(
+            @PathVariable Long boardId,
             @RequestBody ResponseReplyDto replyDto,
             @AuthenticationPrincipal CustomPrincipal customPrincipal) {
         ResponseReplyDto update = replyService.update(replyDto, customPrincipal.getUserId());
@@ -65,12 +66,13 @@ public class ReplyController {
     /**
      * 전체 댓글 조회
      */
+    // FE 작업중 수정 : sort 기본값을 "latest"에서 "ascending"으로 변경 (기본순 오름차순)
     @GetMapping
     public ResponseEntity<SliceResponseDto> getReply(
             @PathVariable Long boardId,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(defaultValue = "100")int size,
-            @RequestParam (defaultValue = "latest")String sort,
+            @RequestParam (defaultValue = "ascending")String sort,
             @RequestParam(required = false)Integer cursorScore){
         SliceResponseDto result = replyService.getReplyByBoard(boardId, sort, cursorScore, cursorId, size);
         return ResponseEntity.ok(result);
@@ -109,11 +111,35 @@ public class ReplyController {
         return ResponseEntity.ok(replyService.downVoteReply(replyId, customPrincipal.getUserId()));
     }
     
+    // FE 작업중 수정 : 채택된 댓글이 없을 때 404 반환하도록 Optional 처리 추가
     /**
      * 채택된 댓글 조회 - boardId
      */
     @GetMapping("/selected")
     public ResponseEntity<ResponseReplyDto> getSelectedReply (@PathVariable Long boardId) {
-        return ResponseEntity.ok(replyService.getSelectedReply(boardId));
+        return replyService.getSelectedReply(boardId)
+                .map(ResponseReplyDto -> ResponseEntity.ok(ResponseReplyDto))
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
+    // FE 작업중 수정 : Soft delete된 댓글들 정리 엔드포인트 추가 (관리자만 사용 가능)
+    /**
+     * Soft delete된 댓글들 정리 (관리자만 사용 가능)
+     * 자식이 모두 삭제된 soft delete 댓글들을 완전히 삭제
+     * boardId는 무시됨 (전체 댓글 정리)
+     */
+    @PostMapping("/cleanup")
+    public ResponseEntity<Integer> cleanupDeletedReplies(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal CustomPrincipal customPrincipal) {
+        // 관리자 권한 확인
+        boolean isAdmin = customPrincipal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        int deletedCount = replyService.cleanupDeletedReplies();
+        return ResponseEntity.ok(deletedCount);
     }
 }

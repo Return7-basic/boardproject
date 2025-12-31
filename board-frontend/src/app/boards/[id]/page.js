@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
+import ReplyList from '@/components/reply/ReplyList';
 import { useState } from 'react';
 import { 
   Loader2, 
@@ -186,13 +187,12 @@ export default function BoardDetailPage({ params }) {
         )}
       </Card>
 
-      {/* 댓글 섹션 - 3단계에서 구현 예정 */}
+      {/* 댓글 섹션 */}
       <Card className="p-6 lg:p-8">
-        <h2 className="text-lg font-semibold text-white mb-4">답변</h2>
-        <div className="text-center py-8">
-          <p className="text-slate-400 mb-2">아직 답변이 없습니다</p>
-          <p className="text-slate-500 text-sm">이 질문에 첫 답변을 남겨주세요!</p>
-        </div>
+        <ReplyList 
+          boardId={id} 
+          boardWriterLoginId={board.writerLoginId}
+        />
       </Card>
 
       {/* 삭제 확인 모달 */}

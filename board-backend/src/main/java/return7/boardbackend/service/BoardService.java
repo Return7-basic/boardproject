@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import return7.boardbackend.dto.board.BoardDto;
+import return7.boardbackend.dto.board.BoardListResponseDto;
 import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
@@ -14,6 +15,7 @@ import return7.boardbackend.repository.ReplyRepository;
 import return7.boardbackend.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -44,17 +46,24 @@ public class BoardService {
         return boardRepository.save(board).getId();
     }
 
+    // FE 작업중 수정 : 반환 타입을 List<BoardDto>에서 BoardListResponseDto로 변경하여 hasNext 정보 제공
     /**
      * 게시글 전체 조회
      */
     @Transactional(readOnly = true)
-    public List<BoardDto> findAll(int page, int size){//내림차순정렬.
+    public BoardListResponseDto findAll(int page, int size){//내림차순정렬.
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
-        return boardRepository.findAll(pageable)
+        Page<Board> boardPage = boardRepository.findAll(pageable);
+        
+        List<BoardDto> boardDtos = boardPage.getContent()
                 .stream()
                 .map(BoardDto::from)
                 .collect(Collectors.toList());
+        
+        boolean hasNext = boardPage.hasNext();
+        
+        return new BoardListResponseDto(boardDtos, hasNext);
     }
 
     /**
