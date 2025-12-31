@@ -36,7 +36,18 @@ api.interceptors.response.use(
         const isAuthCheck = requestUrl.includes('/api/users/me');
         const isAuthPage = currentPath === '/login' || currentPath === '/signup';
         
-        if (!isAuthCheck && !isAuthPage) {
+        // /api/users/me의 401 에러는 성공 응답으로 변환하여 조용히 처리
+        if (isAuthCheck) {
+          // 401을 성공 응답으로 변환 (콘솔에 에러가 표시되지 않음)
+          return Promise.resolve({
+            ...error.response,
+            status: 401,
+            statusText: 'Unauthorized',
+            data: null,
+          });
+        }
+        
+        if (!isAuthPage) {
           window.location.href = '/login';
         }
       }

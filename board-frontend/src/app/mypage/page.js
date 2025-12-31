@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { changeNickname, changePassword } from '@/api/users';
+import { changeNickname, changePassword, getMe } from '@/api/users';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
@@ -28,11 +28,19 @@ export default function MyPage() {
   // 닉네임 변경 뮤테이션
   const nicknameMutation = useMutation({
     mutationFn: changeNickname,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
-      setIsEditingNickname(false);
-      setMessage({ type: 'success', text: '닉네임이 변경되었습니다.' });
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    onSuccess: async () => {
+      // 서버에서 최신 사용자 정보를 가져와서 캐시를 직접 업데이트
+      try {
+        const updatedUser = await getMe();
+        queryClient.setQueryData(['auth', 'me'], updatedUser);
+        setIsEditingNickname(false);
+        setMessage({ type: 'success', text: '닉네임이 변경되었습니다.' });
+        setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      } catch (error) {
+        // 실패 시에도 캐시 무효화
+        queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+        setMessage({ type: 'error', text: '닉네임은 변경되었지만 정보를 새로고침하는데 실패했습니다.' });
+      }
     },
     onError: (error) => {
       setMessage({ type: 'error', text: error.response?.data?.message || '닉네임 변경에 실패했습니다.' });

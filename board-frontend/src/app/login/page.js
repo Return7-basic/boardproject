@@ -159,10 +159,12 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => handleOAuthLogin('kakao')}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FEE500] hover:bg-[#fdd800] text-[#191919] font-medium rounded-lg transition-colors"
+            disabled
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FEE500]/50 hover:bg-[#FEE500]/50 text-[#191919]/50 font-medium rounded-lg transition-colors cursor-not-allowed opacity-50"
+            title="카카오 로그인은 현재 점검 중입니다"
           >
             <KakaoIcon />
-            카카오로 계속하기
+            카카오로 계속하기 (점검 중)
           </button>
         </div>
 
