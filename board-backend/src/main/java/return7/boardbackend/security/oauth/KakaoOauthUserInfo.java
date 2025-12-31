@@ -16,8 +16,13 @@ public class KakaoOauthUserInfo implements OauthUserInfo {
         this.id = attributes.get("id");
         this.kakaoAccount =
                 (Map<String, Object>) attributes.get("kakao_account");
-        this.profile =
-                (Map<String, Object>) kakaoAccount.get("profile");
+        // kakaoAccount가 null일 수 있으므로 null 체크
+        if (this.kakaoAccount != null) {
+            this.profile =
+                    (Map<String, Object>) kakaoAccount.get("profile");
+        } else {
+            this.profile = null;
+        }
     }
 
     @Override
@@ -32,12 +37,17 @@ public class KakaoOauthUserInfo implements OauthUserInfo {
 
     @Override
     public String getEmail() {
+        // kakaoAccount가 null이거나 email이 없을 수 있음
+        if (kakaoAccount == null) {
+            return null;
+        }
         return (String) kakaoAccount.get("email");
     }
 
     @Override
     public String getName() {
-        if (profile.get("nickname") != null) {
+        // profile이 null일 수 있으므로 null 체크
+        if (profile != null && profile.get("nickname") != null) {
             return (String) profile.get("nickname");
         }
         return nickname;

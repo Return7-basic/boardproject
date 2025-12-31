@@ -1,6 +1,7 @@
 package return7.boardbackend.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,9 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOauthSuccessHandler customOauthSuccessHandler;
+    
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -47,6 +51,7 @@ public class SecurityConfig {
 
                         //USER 권한
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")
@@ -93,6 +98,11 @@ public class SecurityConfig {
                         )
                         // .defaultSuccessUrl("/", true)
                         .successHandler(customOauthSuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            // OAuth2 인증 실패 시 프론트엔드로 리다이렉트
+                            response.sendRedirect(frontendUrl + "/?login=error&message=" + 
+                                java.net.URLEncoder.encode(exception.getMessage(), "UTF-8"));
+                        })
                 )
 
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))

@@ -3,15 +3,20 @@ package return7.boardbackend.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import return7.boardbackend.security.principal.CustomPrincipal;
 
 import java.io.IOException;
 
 @Component
 public class CustomOauthSuccessHandler implements AuthenticationSuccessHandler {
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -31,8 +36,13 @@ public class CustomOauthSuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
         
-        // 로그인 성공 후 메인 페이지로 리다이렉트
-        response.sendRedirect("/");
-        return;
+        // 프론트엔드 URL로 리다이렉트
+        String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+                .path("/")
+                .queryParam("login", "success")
+                .build()
+                .toUriString();
+        
+        response.sendRedirect(redirectUrl);
     }
 }
