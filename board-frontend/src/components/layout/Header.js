@@ -1,12 +1,28 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
-import Button from '@/components/ui/Button';
-import { User, LogOut, LogIn, UserPlus, MessageSquare, List } from 'lucide-react';
+import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import Button from "@/components/ui/Button";
+import {
+  User,
+  LogOut,
+  LogIn,
+  UserPlus,
+  MessageSquare,
+  List,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const { user, isLoggedIn, isLoading, logout } = useAuth();
+
+  // 2. 마운트 여부 확인용 state 추가
+  const [mounted, setMounted] = useState(false);
+
+  // 3. 브라우저에서 렌더링이 완료된 후에만 mounted를 true로 변경
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl">
@@ -30,7 +46,9 @@ export default function Header() {
               <span className="hidden sm:inline">게시판</span>
             </Button>
           </Link>
-          {isLoading ? (
+          
+          {/* 마운트 전이거나 로딩 중일 때 스켈레톤 표시 */}
+          {!mounted || isLoading ? (
             <div className="w-24 h-10 bg-slate-800 rounded-lg animate-pulse" />
           ) : isLoggedIn ? (
             <>
@@ -39,7 +57,7 @@ export default function Header() {
                 <User size={16} className="text-indigo-400" />
                 <span className="text-sm text-slate-300">{user?.nickname}</span>
               </div>
-              
+
               {/* 마이페이지 버튼 */}
               <Link href="/mypage">
                 <Button variant="ghost" size="sm">
@@ -47,7 +65,7 @@ export default function Header() {
                   <span className="hidden sm:inline">마이페이지</span>
                 </Button>
               </Link>
-              
+
               {/* 로그아웃 버튼 */}
               <Button variant="outline" size="sm" onClick={() => logout()}>
                 <LogOut size={18} />
@@ -63,7 +81,7 @@ export default function Header() {
                   <span className="hidden sm:inline">로그인</span>
                 </Button>
               </Link>
-              
+
               {/* 회원가입 버튼 */}
               <Link href="/signup">
                 <Button variant="primary" size="sm">
@@ -78,4 +96,3 @@ export default function Header() {
     </header>
   );
 }
-
