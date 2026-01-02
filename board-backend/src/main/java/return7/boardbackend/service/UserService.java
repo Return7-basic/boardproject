@@ -89,8 +89,8 @@ public class UserService {
 
     /** 비밀번호 찾기 */
     @Transactional
-    public void requestResetPassword(String email, Long id){
-        User user = userRepository.findByEmailAndId(email, id)
+    public void requestResetPassword(String email, String loginId){
+        User user = userRepository.findByEmailAndLoginId(email, loginId)
                 .orElseThrow(() -> new UserNotFoundException("해당 유저가 존재하지 않습니다."));
 
         PasswordResetToken token = tokenRepository.save(PasswordResetToken.create(user));

@@ -22,8 +22,8 @@ public class PasswordResetController {
     /**
      * 비밀 번호 재 설정 요청(메일 발송*/
     @PostMapping("/request")
-    public ResponseEntity<ApiResponse> request(@RequestBody PasswordResetRequestDto dto, @AuthenticationPrincipal CustomPrincipal customPrincipal) {
-        userService.requestResetPassword(dto.getEmail(), customPrincipal.getUserId());
+    public ResponseEntity<ApiResponse> request(@RequestBody PasswordResetRequestDto dto) {
+        userService.requestResetPassword(dto.getEmail(), dto.getLoginId());
         return ResponseEntity.ok(
                 new ApiResponse(true, "비밀번호 재설정 메일이 발송되었습니다.메일을 확인해주세요.")
         );

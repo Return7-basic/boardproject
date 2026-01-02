@@ -11,4 +11,7 @@ public class PasswordResetRequestDto {
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "이메일을 입력해주세요")
     private String email;
+
+    @NotBlank
+    private String loginId;
 }

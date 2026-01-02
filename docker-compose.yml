@@ -37,6 +37,8 @@ services:
     container_name: frontend
     expose:
       - "3000"
+    ports:
+      - "3000:3000"
     networks:
       - spring-net
     depends_on:
