@@ -43,3 +43,6 @@ out/
 .vscode/
 # Environment variables
 .env
+
+# db 내용
+/db_data/
