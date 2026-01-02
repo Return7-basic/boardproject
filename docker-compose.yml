@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   nginx:
     image: nginx:1.25-alpine
@@ -33,12 +31,10 @@ services:
     restart: on-failure
 
   frontend:
-    image: return7-frontend:1.0
+    image: return7-frontend:1.1
     container_name: frontend
     expose:
       - "3000"
-    ports:
-      - "3000:3000"
     networks:
       - spring-net
     depends_on:

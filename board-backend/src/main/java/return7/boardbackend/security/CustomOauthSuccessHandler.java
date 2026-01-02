@@ -36,12 +36,27 @@ public class CustomOauthSuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
         
-        // 프론트엔드 URL로 리다이렉트
-        String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
-                .path("/")
-                .queryParam("login", "success")
-                .build()
-                .toUriString();
+        // 세션에서 신규 OAuth 회원 여부 확인
+        Boolean isNewOAuthUser = (Boolean) request.getSession().getAttribute("isNewOAuthUser");
+        
+        String redirectUrl;
+        if (Boolean.TRUE.equals(isNewOAuthUser)) {
+            // 신규 회원인 경우 닉네임 설정 페이지로 리다이렉트
+            redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+                    .path("/oauth-edit")
+                    .queryParam("login", "success")
+                    .build()
+                    .toUriString();
+            // 세션에서 플래그 제거 (한 번만 사용)
+            request.getSession().removeAttribute("isNewOAuthUser");
+        } else {
+            // 기존 회원인 경우 메인 페이지로 리다이렉트
+            redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+                    .path("/")
+                    .queryParam("login", "success")
+                    .build()
+                    .toUriString();
+        }
         
         response.sendRedirect(redirectUrl);
     }

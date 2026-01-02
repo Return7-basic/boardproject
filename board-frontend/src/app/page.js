@@ -1,16 +1,47 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { MessageSquare, Users, Award, ArrowRight } from 'lucide-react';
+import { MessageSquare, Users, Award, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { isLoggedIn } = useAuth();
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // 로그인 성공 및 닉네임 변경 완료 메시지 처리
+  useEffect(() => {
+    const login = searchParams.get('login');
+    const nickname = searchParams.get('nickname');
+
+    if (login === 'success') {
+      setSuccessMessage('로그인에 성공했습니다!');
+      router.replace('/', { scroll: false });
+      setTimeout(() => setSuccessMessage(''), 5000);
+    } else if (nickname === 'changed') {
+      setSuccessMessage('닉네임이 설정되었습니다!');
+      router.replace('/', { scroll: false });
+      setTimeout(() => setSuccessMessage(''), 5000);
+    }
+  }, [searchParams, router]);
 
   return (
     <div className="animate-fade-in">
+      {/* 성공 메시지 */}
+      {successMessage && (
+        <div className="fixed top-[84px] left-1/2 transform -translate-x-1/2 z-50 animate-slide-down">
+          <div className="flex items-center gap-2 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 shadow-lg">
+            <CheckCircle size={20} />
+            <span className="font-medium">{successMessage}</span>
+          </div>
+        </div>
+      )}
+
       {/* 히어로 섹션 */}
       <section className="text-center py-16 lg:py-24">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-sm text-indigo-400 mb-6">

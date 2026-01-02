@@ -13,5 +13,5 @@ public class PasswordResetRequestDto {
     private String email;
 
     @NotBlank
-    private String loginId;
+    private String longinId;
 }

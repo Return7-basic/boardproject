@@ -192,7 +192,7 @@ export default function SignupPage() {
           
           <Button
             type="submit"
-            className="w-full"
+            className="w-full py-3"
             disabled={signupMutation.isPending}
           >
             {signupMutation.isPending ? '가입 중...' : '회원가입'}

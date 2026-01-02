@@ -24,7 +24,7 @@ function GoogleIcon() {
 function NaverIcon() {
   return (
     <svg viewBox="0 0 24 24" className="w-5 h-5">
-      <path fill="#03C75A" d="M16.273 12.845L7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727z"/>
+      <path fill="white" d="M16.273 12.845L7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727z"/>
     </svg>
   );
 }
@@ -119,7 +119,7 @@ export default function LoginPage() {
           
           <Button
             type="submit"
-            className="w-full"
+            className="w-full py-3"
             disabled={loginLoading}
           >
             {loginLoading ? '로그인 중...' : '로그인'}
@@ -141,7 +141,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => handleOAuthLogin('google')}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-gray-800 font-medium rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-gray-800 font-medium rounded-lg transition-colors cursor-pointer"
           >
             <GoogleIcon />
             Google로 계속하기
@@ -150,7 +150,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => handleOAuthLogin('naver')}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#03C75A] hover:bg-[#02b351] text-white font-medium rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#03C75A] hover:bg-[#02b351] text-white font-medium rounded-lg transition-colors cursor-pointer"
           >
             <NaverIcon />
             네이버로 계속하기
@@ -159,22 +159,27 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => handleOAuthLogin('kakao')}
-            disabled
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FEE500]/50 hover:bg-[#FEE500]/50 text-[#191919]/50 font-medium rounded-lg transition-colors cursor-not-allowed opacity-50"
-            title="카카오 로그인은 현재 점검 중입니다"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#191919] font-medium rounded-lg transition-colors cursor-pointer"
           >
             <KakaoIcon />
-            카카오로 계속하기 (점검 중)
+            카카오로 계속하기
           </button>
         </div>
 
-        {/* 회원가입 링크 */}
-        <p className="text-center text-slate-400 text-sm mt-8">
-          계정이 없으신가요?{' '}
-          <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium">
-            회원가입
-          </Link>
-        </p>
+        {/* 비밀번호 찾기 및 회원가입 링크 */}
+        <div className="text-center space-y-2 mt-8">
+          <p className="text-slate-400 text-sm">
+            <Link href="/forgot-password" className="text-indigo-400 hover:text-indigo-300 font-medium">
+              비밀번호를 잊으셨나요?
+            </Link>
+          </p>
+          <p className="text-slate-400 text-sm">
+            계정이 없으신가요?{' '}
+            <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium">
+              회원가입
+            </Link>
+          </p>
+        </div>
       </Card>
     </div>
   );

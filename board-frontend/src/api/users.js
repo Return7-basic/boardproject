@@ -60,3 +60,21 @@ export const deleteUser = async () => {
   return response.data;
 };
 
+/**
+ * 비밀번호 재설정 요청 (이메일 발송)
+ * @param {Object} data - { email, loginId }
+ */
+export const requestPasswordReset = async (data) => {
+  const response = await api.post('/password/request', data);
+  return response.data;
+};
+
+/**
+ * 비밀번호 재설정 (토큰으로)
+ * @param {Object} data - { token, newPassword }
+ */
+export const resetPassword = async (data) => {
+  const response = await api.post('/password/reset', data);
+  return response.data;
+};
+

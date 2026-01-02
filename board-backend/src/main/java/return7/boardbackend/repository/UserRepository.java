@@ -1,9 +1,10 @@
 package return7.boardbackend.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import return7.boardbackend.entity.User;
-
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import return7.boardbackend.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     //로그인,인증
@@ -13,5 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByNickname(String nickname);
 
-    Optional<User> findByEmailAndLoginId(String email, String loginId);
+    Optional<User> findByEmailAndId(String email, Long id);
+
+    Optional<User> findFirstByEmailAndLoginId(String email, String loginId);
 }

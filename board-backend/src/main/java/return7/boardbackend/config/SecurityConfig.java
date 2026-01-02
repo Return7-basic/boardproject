@@ -51,6 +51,9 @@ public class SecurityConfig {
                         //회원가입 페이지
                         .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
 
+                        //비밀번호 재설정 (비로그인 허용)
+                        .requestMatchers("/password/**").permitAll()
+
                         //USER 권한
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("USER")
@@ -131,8 +134,7 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         corsConfiguration.setAllowedOrigins(List.of(
-                "http://localhost",
-                "http://localhost:3000"));
+                "http://localhost"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);

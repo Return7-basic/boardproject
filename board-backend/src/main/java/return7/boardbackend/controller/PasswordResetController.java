@@ -3,12 +3,10 @@ package return7.boardbackend.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.dto.user.ApiResponse;
 import return7.boardbackend.dto.user.PasswordResetDto;
 import return7.boardbackend.dto.user.PasswordResetRequestDto;
-import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.UserService;
 
 @Slf4j
@@ -20,10 +18,12 @@ public class PasswordResetController {
     private final UserService userService;
 
     /**
-     * 비밀 번호 재 설정 요청(메일 발송*/
+     * 비밀 번호 재 설정 요청(메일 발송)
+     * 비로그인 사용자도 사용 가능
+     */
     @PostMapping("/request")
     public ResponseEntity<ApiResponse> request(@RequestBody PasswordResetRequestDto dto) {
-        userService.requestResetPassword(dto.getEmail(), dto.getLoginId());
+        userService.requestResetPassword(dto.getEmail(), dto.getLonginId());
         return ResponseEntity.ok(
                 new ApiResponse(true, "비밀번호 재설정 메일이 발송되었습니다.메일을 확인해주세요.")
         );
