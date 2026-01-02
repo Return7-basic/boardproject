@@ -3,8 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMe } from '@/api/users';
 import { login as loginApi, logout as logoutApi } from '@/api/auth';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 // 로컬 스토리지 키
 const LOGIN_FLAG_KEY = 'has_logged_in';
@@ -25,19 +25,23 @@ function hasLoginHint() {
   return hasLoginFlag || hasCookie;
 }
 
+// URL에서 쿼리 파라미터 가져오기 (클라이언트 전용)
+function getSearchParam(key) {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key);
+}
+
 export function useAuth() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [isOAuthSuccess, setIsOAuthSuccess] = useState(false);
 
-  // OAuth 로그인 성공 확인
-  const isOAuthSuccess = useMemo(() => {
-    return searchParams.get('login') === 'success';
-  }, [searchParams]);
-
-  // OAuth 로그인 성공 처리
+  // 클라이언트에서 OAuth 로그인 성공 확인
   useEffect(() => {
-    if (isOAuthSuccess) {
+    const loginParam = getSearchParam('login');
+    if (loginParam === 'success') {
+      setIsOAuthSuccess(true);
       // 로그인 플래그 설정
       localStorage.setItem(LOGIN_FLAG_KEY, 'true');
       // URL에서 쿼리 파라미터 제거
@@ -45,7 +49,7 @@ export function useAuth() {
       // 사용자 정보 즉시 조회
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     }
-  }, [isOAuthSuccess, queryClient, router]);
+  }, [queryClient, router]);
 
   // 로그인 가능성 확인 (초기 로드 시)
   const shouldFetch = useMemo(() => {
