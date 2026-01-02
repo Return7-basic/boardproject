@@ -53,6 +53,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BoardVote> boardVotes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PasswordResetToken> tokens = new ArrayList<>();
+
     /** 비밀번호 변경 */
     public void changePassword(String newPassword){
         this.password=newPassword;
