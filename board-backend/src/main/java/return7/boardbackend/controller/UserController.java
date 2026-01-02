@@ -52,5 +52,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /** 회원 탈퇴 */
+    @DeleteMapping("/me/delete")
+    public ResponseEntity<Void> deleteUser(
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        userService.deleteUser(principal.getUserId());
+        return ResponseEntity.noContent().build();
+    }
 
 }

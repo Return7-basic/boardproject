@@ -41,6 +41,7 @@ public class Reply {
     private Board board;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true)
     private User writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -72,5 +73,9 @@ public class Reply {
     public void changeVote(VoteType from, VoteType to) {
         cancelVote(from);
         applyVote(to);
+    }
+
+    public void setUser(User writer) {
+        this.writer = writer;
     }
 }

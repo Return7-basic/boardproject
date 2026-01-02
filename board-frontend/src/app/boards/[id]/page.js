@@ -119,7 +119,9 @@ export default function BoardDetailPage({ params }) {
           <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
             <div className="flex items-center gap-1.5">
               <User size={16} className="text-slate-500" />
-              <span>{board.writerNickname || board.writerLoginId}</span>
+              <span className={!board.writerNickname && !board.writerLoginId ? 'text-slate-500 italic' : ''}>
+                {board.writerNickname || board.writerLoginId || '삭제된 사용자'}
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <Calendar size={16} className="text-slate-500" />

@@ -8,7 +8,9 @@ import return7.boardbackend.dto.user.NicknameChangeRequest;
 import return7.boardbackend.dto.user.PasswordChangeRequest;
 import return7.boardbackend.dto.user.UserResponse;
 import return7.boardbackend.dto.user.UserSignupRequest;
+import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.PasswordResetToken;
+import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.exception.NicknameNotNullException;
 import return7.boardbackend.exception.NotMatchPasswordException;
@@ -111,5 +113,21 @@ public class UserService {
         user.changePassword(passwordEncoder.encode(newPassword));
 
         tokenRepository.findByUser(user).stream().forEach(PasswordResetToken::forceExpire);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+
+        for (Board board : user.getBoards()) {
+            board.setUser(null);
+        }
+
+        for (Reply reply : user.getReplies()) {
+            reply.setUser(null);
+        }
+
+        userRepository.deleteById(userId);
     }
 }

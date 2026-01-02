@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { changeNickname, changePassword, getMe } from '@/api/users';
+import { changeNickname, changePassword, getMe, deleteUser } from '@/api/users';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import { User, Edit3, Lock, Save, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
+import { User, Edit3, Lock, Save, X, CheckCircle, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 
 export default function MyPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function MyPage() {
     confirmPassword: '',
   });
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // 닉네임 변경 뮤테이션
   const nicknameMutation = useMutation({
@@ -58,6 +60,19 @@ export default function MyPage() {
     },
     onError: (error) => {
       setMessage({ type: 'error', text: error.response?.data?.message || '비밀번호 변경에 실패했습니다.' });
+    },
+  });
+
+  // 회원 탈퇴 뮤테이션
+  const deleteMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: () => {
+      queryClient.clear();
+      window.location.href = '/?deleted=true';
+    },
+    onError: (error) => {
+      setShowDeleteModal(false);
+      setMessage({ type: 'error', text: error.response?.data?.message || '회원 탈퇴에 실패했습니다.' });
     },
   });
 
@@ -209,7 +224,7 @@ export default function MyPage() {
       </Card>
 
       {/* 비밀번호 변경 카드 */}
-      <Card className="p-6">
+      <Card className="p-6 mb-6">
         <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <Lock size={20} className="text-indigo-400" />
           비밀번호 변경
@@ -262,6 +277,60 @@ export default function MyPage() {
           </div>
         )}
       </Card>
+
+      {/* 회원 탈퇴 카드 */}
+      <Card className="p-6 border-rose-500/30">
+        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Trash2 size={20} className="text-rose-400" />
+          회원 탈퇴
+        </h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-slate-400 text-sm">계정을 삭제하면 모든 데이터가 삭제됩니다.</p>
+            <p className="text-rose-400 text-xs mt-1">이 작업은 되돌릴 수 없습니다.</p>
+          </div>
+          <Button 
+            variant="danger" 
+            size="sm" 
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <Trash2 size={16} />
+            회원 탈퇴
+          </Button>
+        </div>
+      </Card>
+
+      {/* 회원 탈퇴 확인 모달 */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="회원 탈퇴"
+      >
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto rounded-full bg-rose-500/20 flex items-center justify-center mb-4">
+            <Trash2 size={32} className="text-rose-400" />
+          </div>
+          <p className="text-slate-300 mb-2">
+            정말로 탈퇴하시겠습니까?
+          </p>
+          <p className="text-slate-500 text-sm mb-6">
+            탈퇴 시 작성하신 게시글과 댓글은 유지되지만,<br />
+            작성자 정보는 "삭제된 사용자"로 표시됩니다.
+          </p>
+          <div className="flex justify-center gap-2">
+            <Button variant="ghost" onClick={() => setShowDeleteModal(false)}>
+              취소
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={() => deleteMutation.mutate()}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? '탈퇴 처리 중...' : '탈퇴하기'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

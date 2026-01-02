@@ -83,11 +83,8 @@ export default function ReplyItem({
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1.5 text-sm">
               <User size={14} className="text-slate-400" />
-              <span className="text-slate-300 font-medium">
-                {isDeleted 
-                  ? '삭제된 사용자' 
-                  : reply.writerNickname || `작성자 ${reply.writerId || '알 수 없음'}`
-                }
+              <span className={`font-medium ${!reply.writerNickname && !reply.writerId ? 'text-slate-500 italic' : 'text-slate-300'}`}>
+                {reply.writerNickname || (reply.writerId ? `작성자 ${reply.writerId}` : '삭제된 사용자')}
               </span>
             </div>
             

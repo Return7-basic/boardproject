@@ -46,6 +46,7 @@ public class Board {
     private List<Reply> replies = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true) // 만약 탈퇴해도 글을 남기고 싶다면
     private User writer;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
@@ -86,5 +87,9 @@ public class Board {
         }
         this.selected=true;
         this.selectedReply=reply;
+    }
+
+    public void setUser(User writer) {
+        this.writer = writer;
     }
 }

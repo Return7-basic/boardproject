@@ -78,11 +78,8 @@ export function useUpVoteBoard() {
 
   return useMutation({
     mutationFn: upVoteBoard,
-    // 성공 시 서버 응답의 실제 카운트로 업데이트
     onSuccess: (data, boardId) => {
-      console.log('upVote 응답:', data, 'boardId:', boardId);
       const previousBoard = queryClient.getQueryData(['board', boardId]);
-      console.log('이전 board 데이터:', previousBoard);
       if (previousBoard && data) {
         queryClient.setQueryData(['board', boardId], {
           ...previousBoard,
@@ -100,11 +97,8 @@ export function useDownVoteBoard() {
 
   return useMutation({
     mutationFn: downVoteBoard,
-    // 성공 시 서버 응답의 실제 카운트로 업데이트
     onSuccess: (data, boardId) => {
-      console.log('downVote 응답:', data, 'boardId:', boardId);
       const previousBoard = queryClient.getQueryData(['board', boardId]);
-      console.log('이전 board 데이터:', previousBoard);
       if (previousBoard && data) {
         queryClient.setQueryData(['board', boardId], {
           ...previousBoard,

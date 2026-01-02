@@ -45,7 +45,9 @@ export default function BoardCard({ board }) {
               {/* 작성자 */}
               <div className="flex items-center gap-1.5">
                 <User size={14} className="text-slate-500" />
-                <span>{board.writerNickname || board.writerLoginId}</span>
+                <span className={!board.writerNickname && !board.writerLoginId ? 'text-slate-500 italic' : ''}>
+                  {board.writerNickname || board.writerLoginId || '삭제된 사용자'}
+                </span>
               </div>
               
               {/* 작성일 */}

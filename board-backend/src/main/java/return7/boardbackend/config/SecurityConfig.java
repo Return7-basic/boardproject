@@ -52,6 +52,7 @@ public class SecurityConfig {
                         //USER 권한
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")

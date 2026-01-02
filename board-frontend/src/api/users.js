@@ -52,3 +52,11 @@ export const changePassword = async (data) => {
   return response.data;
 };
 
+/**
+ * 회원 탈퇴
+ */
+export const deleteUser = async () => {
+  const response = await api.delete('/api/users/me/delete');
+  return response.data;
+};
+

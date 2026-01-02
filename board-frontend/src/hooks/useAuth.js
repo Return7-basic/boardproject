@@ -105,16 +105,14 @@ export function useAuth() {
   // 로그아웃
   const logoutMutation = useMutation({
     mutationFn: logoutApi,
-    onSuccess: (response) => {
-      console.log('로그아웃 성공:', response);
+    onSuccess: () => {
       // 로그인 플래그 제거
       localStorage.removeItem(LOGIN_FLAG_KEY);
       queryClient.clear();
       // 페이지 새로고침으로 확실하게 상태 초기화
       window.location.href = '/';
     },
-    onError: (error) => {
-      console.log('로그아웃 실패:', error);
+    onError: () => {
       // 실패해도 클라이언트 상태는 초기화
       localStorage.removeItem(LOGIN_FLAG_KEY);
       queryClient.clear();

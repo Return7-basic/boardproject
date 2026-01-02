@@ -44,8 +44,14 @@ public class User {
     @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "writer")
+    @OneToMany(mappedBy = "writer",  fetch = FetchType.LAZY)
     private List<Reply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ReplyVote> replyVotes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BoardVote> boardVotes = new ArrayList<>();
 
     /** 비밀번호 변경 */
     public void changePassword(String newPassword){
