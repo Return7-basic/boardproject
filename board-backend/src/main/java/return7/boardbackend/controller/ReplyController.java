@@ -117,9 +117,7 @@ public class ReplyController {
      */
     @GetMapping("/selected")
     public ResponseEntity<ResponseReplyDto> getSelectedReply (@PathVariable Long boardId) {
-        return replyService.getSelectedReply(boardId)
-                .map(ResponseReplyDto -> ResponseEntity.ok(ResponseReplyDto))
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(replyService.getSelectedReply(boardId));
     }
     
     // FE 작업중 수정 : Soft delete된 댓글들 정리 엔드포인트 추가 (관리자만 사용 가능)

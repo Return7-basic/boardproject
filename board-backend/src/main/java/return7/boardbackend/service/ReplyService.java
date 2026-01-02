@@ -333,12 +333,13 @@ public class ReplyService {
      * 채택된 댓글만 조회
      */
     @Transactional(readOnly = true)
-    public Optional<ResponseReplyDto> getSelectedReply(Long boardId) {
+    public ResponseReplyDto getSelectedReply(Long boardId) {
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시물을 찾을 수 없습니다."));
 
-        Optional<Reply> replyOptional = replyRepository.findByBoardIdAndIsSelectedTrue(boardId);
-        
-        return replyOptional.map(ResponseReplyDto::from);
+//        Optional<Reply> replyOptional = replyRepository.findByBoardIdAndIsSelectedTrue(boardId);
+        Reply reply = replyRepository.findByBoardIdAndIsSelectedTrue(boardId)
+                .orElseThrow(()->new ReplyNotFound("답글을 찾을 수 없습니다."));
+        return ResponseReplyDto.from(reply);
     }
 }
