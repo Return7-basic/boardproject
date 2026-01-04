@@ -1,23 +1,29 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { MessageSquare, Users, Award, ArrowRight, CheckCircle } from 'lucide-react';
 
+// URL에서 쿼리 파라미터 가져오기 (클라이언트 전용)
+function getSearchParam(key) {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key);
+}
+
 export default function Home() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isLoggedIn } = useAuth();
   const [successMessage, setSuccessMessage] = useState('');
 
   // 로그인 성공 및 닉네임 변경 완료 메시지 처리
   useEffect(() => {
-    const login = searchParams.get('login');
-    const nickname = searchParams.get('nickname');
+    const login = getSearchParam('login');
+    const nickname = getSearchParam('nickname');
 
     if (login === 'success') {
       setSuccessMessage('로그인에 성공했습니다!');
@@ -28,7 +34,7 @@ export default function Home() {
       router.replace('/', { scroll: false });
       setTimeout(() => setSuccessMessage(''), 5000);
     }
-  }, [searchParams, router]);
+  }, [router]);
 
   return (
     <div className="animate-fade-in">

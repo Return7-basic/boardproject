@@ -1,19 +1,19 @@
-import api from '@/lib/axios';
+import api from "@/lib/axios";
 
 /**
  * 폼 로그인
- * @param {string} loginId 
- * @param {string} password 
+ * @param {string} loginId
+ * @param {string} password
  */
 export const login = async (loginId, password) => {
   // Spring Security formLogin은 form-data 형식 필요
   const formData = new URLSearchParams();
-  formData.append('loginId', loginId);
-  formData.append('password', password);
-  
-  const response = await api.post('/login', formData, {
+  formData.append("loginId", loginId);
+  formData.append("password", password);
+
+  const response = await api.post("/login", formData, {
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
   });
   return response;
@@ -23,15 +23,14 @@ export const login = async (loginId, password) => {
  * 로그아웃
  */
 export const logout = async () => {
-  const response = await api.post('/logout');
+  const response = await api.post("/logout");
   return response;
 };
 
 /**
  * OAuth2 로그인 URL 반환
- * @param {'google' | 'naver' | 'kakao'} provider 
+ * @param {'google' | 'naver' | 'kakao'} provider
  */
 export const getOAuth2LoginUrl = (provider) => {
-  return `http://localhost:8080/oauth2/authorization/${provider}`;
+  return `/oauth2/authorization/${provider}`;
 };
-

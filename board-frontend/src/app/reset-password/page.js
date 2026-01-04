@@ -1,17 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { resetPassword } from '@/api/users';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { Lock, CheckCircle2, AlertCircle, KeyRound } from 'lucide-react';
 
+// URL에서 쿼리 파라미터 가져오기 (클라이언트 전용)
+function getSearchParam(key) {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key);
+}
+
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const [token, setToken] = useState(null);
+  const [tokenChecked, setTokenChecked] = useState(false);
+
+  // 클라이언트에서 토큰 확인
+  useEffect(() => {
+    const urlToken = getSearchParam('token');
+    setToken(urlToken);
+    setTokenChecked(true);
+  }, []);
 
   const [formData, setFormData] = useState({
     password: '',
@@ -26,10 +40,10 @@ export default function ResetPasswordPage() {
   });
 
   useEffect(() => {
-    if (!token) {
+    if (tokenChecked && !token) {
       setError('유효하지 않은 링크입니다. 비밀번호 재설정 요청을 다시 해주세요.');
     }
-  }, [token]);
+  }, [token, tokenChecked]);
 
   const validatePassword = (password) => {
     if (password.length < 8 || password.length > 20) {
@@ -124,6 +138,15 @@ export default function ResetPasswordPage() {
             </Button>
           </div>
         </Card>
+      </div>
+    );
+  }
+
+  // 토큰 확인 중 로딩
+  if (!tokenChecked) {
+    return (
+      <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12">
+        <div className="text-slate-400">로딩 중...</div>
       </div>
     );
   }
