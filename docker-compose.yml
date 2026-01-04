@@ -39,6 +39,8 @@ services:
       - spring-net
     depends_on:
       - backend
+    env_file:
+      - .env
 
   db:
     image: mysql:8.0
