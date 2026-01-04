@@ -1,0 +1,27 @@
+name: cicd.yml
+on:
+  workflow_run:
+    workflows:
+      - ["backend.yml", "frontend.yml"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    if: ${{ github.event.workflow_run.conclusion == 'success'}}
+
+    steps:
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST}}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker-compose pull
+            
+            docker-compose up -d
+            
+            docker image prune -f
