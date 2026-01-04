@@ -23,8 +23,8 @@ services:
       - spring-net
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       APP_FRONTEND_URL: ${APP_FRONTEND_URL}
     depends_on:
       - db
