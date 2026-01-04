@@ -44,6 +44,7 @@ out/
 # Environment variables
 .env
 .env.*
+*.pem
 
 # db 내용
 /db_data/
