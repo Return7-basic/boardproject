@@ -11,7 +11,7 @@ export const login = async (loginId, password) => {
   formData.append("loginId", loginId);
   formData.append("password", password);
 
-  const response = await api.post("/login", formData, {
+  const response = await api.post("/api/login", formData, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
@@ -23,7 +23,7 @@ export const login = async (loginId, password) => {
  * 로그아웃
  */
 export const logout = async () => {
-  const response = await api.post("/logout");
+  const response = await api.post("/api/logout");
   return response;
 };
 

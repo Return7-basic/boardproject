@@ -75,7 +75,7 @@ public class SecurityConfig {
 
                 // 자체 로그인 (SPA용 JSON 응답)
                 .formLogin(form -> form
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/api/login")
                         .usernameParameter("loginId")
                         .passwordParameter("password")
                         .successHandler((request, response, authentication) -> {
@@ -114,7 +114,7 @@ public class SecurityConfig {
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
 
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutUrl("/api/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler((request, response, authentication) -> {
