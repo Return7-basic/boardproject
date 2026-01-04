@@ -75,4 +75,4 @@ spring:
 
 app:
   frontend:
-    url: ${APP_FRONTEND_URL}
+    url: ${NEXT_PUBLIC_API_URL}
