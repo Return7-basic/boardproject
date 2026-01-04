@@ -1,5 +1,6 @@
 package return7.boardbackend.security.principal;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+@Getter
 public class CustomPrincipal implements UserDetails, OAuth2User {
     private final User user;
     private Map<String, Object> attributes;
@@ -26,6 +28,10 @@ public class CustomPrincipal implements UserDetails, OAuth2User {
         return user.getId();
     }
 
+    public String getUserLoginId() {
+        return user.getLoginId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getAuthority()));
@@ -38,15 +44,13 @@ public class CustomPrincipal implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return user.getNickName();
+        return user.getNickname();
     }
 
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
     }
-
-
 
     // 식별자
     @Override

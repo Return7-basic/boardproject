@@ -1,13 +1,14 @@
 package return7.boardbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import return7.boardbackend.enums.VoteType;
 
 @Entity
 @Getter
 @Builder
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "board_vote",
         uniqueConstraints = {
@@ -31,8 +32,6 @@ public class BoardVote {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private VoteType voteType;
-
-    protected BoardVote(){}//NoArgsConstructor대신(외부new차단)
 
     public BoardVote(User user, Board board, VoteType voteType){
         this.user=user;

@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 public class UserSignupRequest {
     private String loginId;
     private String password;
-    private String nickName;
+    private String nickname;
     private String email;
 }

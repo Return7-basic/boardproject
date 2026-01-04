@@ -7,8 +7,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.dto.reply.RequestReplyDto;
 import return7.boardbackend.dto.reply.ResponseReplyDto;
+import return7.boardbackend.dto.reply.SelectedReplyDto;
 import return7.boardbackend.dto.reply.SliceResponseDto;
 import return7.boardbackend.enums.VoteType;
+import return7.boardbackend.service.BoardService;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.ReplyService;
 
@@ -17,9 +19,7 @@ import return7.boardbackend.service.ReplyService;
 @RequiredArgsConstructor
 public class ReplyController {
     private final ReplyService replyService;
-
-    // page기능 어떡할지 ? - 100개 단위로 쪼개기
-    // 대댓글 접기 여부 백엔드? 프론트?
+    private final BoardService boardService;
 
     /**
      * 댓글 작성 Api
@@ -72,8 +72,10 @@ public class ReplyController {
     public ResponseEntity<SliceResponseDto> getReply(
             @PathVariable Long boardId,
             @RequestParam(required = false) Long cursorId,
-            @RequestParam(defaultValue = "100")int size){
-        SliceResponseDto result = replyService.getReplyByBoard(boardId, cursorId, size);
+            @RequestParam(defaultValue = "100")int size,
+            @RequestParam (defaultValue = "latest")String sort,
+            @RequestParam(required = false)Integer cursorScore){
+        SliceResponseDto result = replyService.getReplyByBoard(boardId, sort, cursorScore, cursorId, size);
         return ResponseEntity.ok(result);
     }
 
@@ -82,10 +84,12 @@ public class ReplyController {
      */
     @PostMapping("/{replyId}/select")
     public ResponseEntity<Boolean> selectReply(
+            @PathVariable Long boardId,
             @PathVariable Long replyId,
             @AuthenticationPrincipal CustomPrincipal customPrincipal
     ) {
-        boolean result = replyService.selectReply(replyId, customPrincipal.getUserId());
+        SelectedReplyDto selected = boardService.selectReply(boardId, replyId, customPrincipal.getUserId());
+        boolean result = replyService.selectReply(replyId, boardId, customPrincipal.getUserId());
         return ResponseEntity.ok(result);
     }
 

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class UserResponse {
     private Long id;
     private String loginId;
-    private String nickName;
+    private String nickname;
     private String email;
     private Authority authority;
     private LocalDateTime createdAt;
@@ -23,7 +23,7 @@ public class UserResponse {
         return UserResponse.builder()
                 .id(user.getId())
                 .loginId(user.getLoginId())
-                .nickName(user.getNickName())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .authority(user.getAuthority())
                 .createdAt(user.getCreatedAt())

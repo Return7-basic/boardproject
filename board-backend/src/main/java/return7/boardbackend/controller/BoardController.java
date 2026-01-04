@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import return7.boardbackend.dto.board.BoardDto;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.BoardService;
+import return7.boardbackend.service.ReplyService;
 
 import java.util.List;
 
@@ -19,8 +19,8 @@ public class BoardController {
 
     /**게시글 작성*/
     @PostMapping
-    public Long createBoard(@RequestBody BoardDto dto){
-       return boardService.createBoard(dto);
+    public Long createBoard(@RequestBody BoardDto dto, @AuthenticationPrincipal CustomPrincipal customPrincipal){
+       return boardService.createBoard(dto, customPrincipal.getUserId());
     }
 
     /**게시글 상세 조회(조회수 증가)*/
@@ -29,7 +29,7 @@ public class BoardController {
         return boardService.findById(boardId);
     }
 
-    //게시글 목록 조회
+    /**게시글 목록 조회*/
     @GetMapping
     public List<BoardDto> getBoards(
             @RequestParam(defaultValue = "0")int page,//page=0 ->1페이지
@@ -56,17 +56,6 @@ public class BoardController {
         boardService.deleteBoard(boardId,principal.getUserId());
         return ResponseEntity.noContent().build();
 
-    }
-
-
-
-    /** 게시글 댓글 채택*/
-    @PostMapping("/{boardId}/replies/{replyId}/select")
-    public ResponseEntity<String> selectReply(
-            @PathVariable Long boardId,
-            @PathVariable Long replyId) {
-        boardService.selectReply(boardId, replyId);
-        return ResponseEntity.ok("댓글 채택됨.");
     }
 
 }

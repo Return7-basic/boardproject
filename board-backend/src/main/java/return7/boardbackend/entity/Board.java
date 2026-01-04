@@ -77,7 +77,6 @@ public class Board {
         applyVote(to);
     }
 
-    //* 채택 관련 메서드*/
     public void selectReply(Reply reply) {
         if(this.selected) {
             throw new ReplyAlreadyAcceptedException("이미 채택된 댓글이 있습니다.");

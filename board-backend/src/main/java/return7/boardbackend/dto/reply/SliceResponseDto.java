@@ -5,4 +5,5 @@ import java.util.List;
 public record SliceResponseDto
     (List<ResponseReplyDto> items,
     boolean hasNext,
-    long nextCursor) {}
+    long nextCursor,
+    Integer nextScore) {}

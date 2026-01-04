@@ -25,10 +25,11 @@ public class User {
     private String password;
 
     @Column(nullable = false, unique = true,length = 30)
-    private String nickName;//닉네임 중복x
+    private String nickname;//닉네임 중복x
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Authority authority=Authority.USER;
 
     @Column(name ="created_at")
@@ -53,8 +54,8 @@ public class User {
     }
 
     /** 닉네임 변경*/
-    public void changeNickName(String newNickName){
-        this.nickName=newNickName;
+    public void changeNickName(String newNickname){
+        this.nickname=newNickname;
         this.updatedAt=LocalDateTime.now();
     }
 
