@@ -1,8 +1,7 @@
-name: cicd.yml
+name: cicd
 on:
   workflow_run:
-    workflows:
-      - ["backend.yml", "frontend.yml"]
+    workflows: [backend, frontend]
     types:
       - completed
 
@@ -20,6 +19,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            cd ~/app
             docker-compose pull
             
             docker-compose up -d

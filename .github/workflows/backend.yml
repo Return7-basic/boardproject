@@ -1,4 +1,4 @@
-name: backend.yml
+name: backend
 on:
   push:
     tags:

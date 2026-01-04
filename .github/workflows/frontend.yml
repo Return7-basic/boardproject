@@ -1,4 +1,4 @@
-name: frontend.yml
+name: frontend
 on:
   push:
     tags:
