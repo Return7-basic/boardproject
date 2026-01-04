@@ -26,7 +26,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOauthSuccessHandler customOauthSuccessHandler;
     
-    @Value("${app.frontend.url}")
+    @Value("${NEXT_PUBLIC_API_URL}")
     private String frontendUrl;
 
     @Bean
@@ -134,7 +134,7 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         corsConfiguration.setAllowedOrigins(List.of(
-                "http://localhost"));
+                frontendUrl));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
