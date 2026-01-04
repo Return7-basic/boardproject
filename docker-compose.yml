@@ -13,7 +13,7 @@ services:
       - spring-net
 
   backend:
-    image: corqu/return7-backend:1.0
+    image: corqu/return7-backend:1.3
     container_name: backend
     expose:
       - "8080"
@@ -31,7 +31,7 @@ services:
     restart: on-failure
 
   frontend:
-    image: corqu/return7-frontend:1.1
+    image: corqu/return7-frontend:1.3
     container_name: frontend
     expose:
       - "3000"
