@@ -1,15 +1,77 @@
-name: cicd
+name: ci/cd
 on:
-  workflow_run:
-    workflows: [backend, frontend]
-    types:
-      - completed
+  push:
+    tags:
+      - "v*"
 
 jobs:
-  deploy:
+  build-and-push-back:
     runs-on: ubuntu-22.04
 
-    if: ${{ github.event.workflow_run.conclusion == 'success'}}
+    defaults:
+      run:
+        working-directory: ./board-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/return7-backend
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./board-backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags}}
+          labels: ${{ steps.meta.outputs.labels}}
+
+  build-and-push-front:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/return7-frontend
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./board-frontend
+          push: true
+          tags: ${{ steps.meta.outputs.tags}}
+          labels: ${{ steps.meta.outputs.labels}}
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: [build-and-push-back, build-and-push-front]
 
     steps:
       - name: SSH Remote Commands
@@ -21,7 +83,7 @@ jobs:
           script: |
             cd ~/app
             docker-compose pull
-            
+
             docker-compose up -d
-            
+
             docker image prune -f
