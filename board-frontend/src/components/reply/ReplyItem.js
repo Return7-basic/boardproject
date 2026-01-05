@@ -41,6 +41,7 @@ export default function ReplyItem({
 
   const isWriter = isLoggedIn && user && user.id === reply.writerId;
   const isBoardWriter = isLoggedIn && user && user.loginId === boardWriterLoginId;
+  const isAdmin = isLoggedIn && user && user.authority === 'ADMIN';
   // isDeleted 필드 확인 (백엔드에서 @JsonProperty로 명시하여 isDeleted로 전송됨)
   const isDeleted = reply.isDeleted === true;
   const maxDepth = 5; // 최대 중첩 깊이 제한
@@ -158,58 +159,48 @@ export default function ReplyItem({
               </button>
             </div>
 
-            {/* 작성자 액션 */}
-            {isWriter ? (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                >
-                  <Edit3 size={14} />
-                  수정
-                </button>
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center gap-1 text-slate-400 hover:text-rose-400 transition-colors text-sm"
-                >
-                  <Trash2 size={14} />
-                  삭제
-                </button>
-                {/* 본인 댓글에도 답글 달기 가능 */}
-                {depth < maxDepth && (
-                  <button
-                    onClick={() => setIsReplying(!isReplying)}
-                    className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                  >
-                    <MessageSquare size={14} />
-                    답글
-                  </button>
-                )}
-              </>
-            ) : (
-              <>
-                {/* 다른 사용자: 대댓글 달기 */}
-                {depth < maxDepth && (
-                  <button
-                    onClick={() => setIsReplying(!isReplying)}
-                    className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                  >
-                    <MessageSquare size={14} />
-                    답글
-                  </button>
-                )}
-                
-                {/* 게시글 작성자: 채택 버튼 */}
-                {isBoardWriter && !hasSelectedReply && !isSelected && (
-                  <button
-                    onClick={() => onSelect(reply.id)}
-                    className="flex items-center gap-1 px-3 py-1 bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 rounded transition-colors text-sm font-medium"
-                  >
-                    <CheckCircle2 size={14} />
-                    채택
-                  </button>
-                )}
-              </>
+            {/* 작성자 액션 (수정은 작성자만, 삭제는 작성자 또는 ADMIN) */}
+            {isWriter && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition-colors text-sm"
+              >
+                <Edit3 size={14} />
+                수정
+              </button>
+            )}
+            
+            {/* 삭제 버튼 (작성자 또는 ADMIN) */}
+            {(isWriter || isAdmin) && (
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="flex items-center gap-1 text-slate-400 hover:text-rose-400 transition-colors text-sm"
+              >
+                <Trash2 size={14} />
+                삭제
+              </button>
+            )}
+            
+            {/* 대댓글 달기 */}
+            {depth < maxDepth && (
+              <button
+                onClick={() => setIsReplying(!isReplying)}
+                className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition-colors text-sm"
+              >
+                <MessageSquare size={14} />
+                답글
+              </button>
+            )}
+            
+            {/* 게시글 작성자: 채택 버튼 */}
+            {isBoardWriter && !hasSelectedReply && !isSelected && !isWriter && (
+              <button
+                onClick={() => onSelect(reply.id)}
+                className="flex items-center gap-1 px-3 py-1 bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 rounded transition-colors text-sm font-medium"
+              >
+                <CheckCircle2 size={14} />
+                채택
+              </button>
             )}
           </div>
         )}

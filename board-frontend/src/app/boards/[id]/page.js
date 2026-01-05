@@ -37,6 +37,9 @@ export default function BoardDetailPage({ params }) {
   // 작성자 본인인지 확인
   const isAuthor = isLoggedIn && user && board && 
     (user.loginId === board.writerLoginId || user.id === board.writerId);
+  
+  // ADMIN 권한 확인
+  const isAdmin = isLoggedIn && user && user.authority === 'ADMIN';
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -168,15 +171,17 @@ export default function BoardDetailPage({ params }) {
           </Button>
         </div>
 
-        {/* 수정/삭제 버튼 (작성자만) */}
-        {isAuthor && (
+        {/* 수정/삭제 버튼 (작성자 또는 ADMIN) */}
+        {(isAuthor || isAdmin) && (
           <div className="flex items-center justify-end gap-2 pt-6">
-            <Link href={`/boards/${id}/edit`}>
-              <Button variant="outline" size="sm">
-                <Edit3 size={16} />
-                수정
-              </Button>
-            </Link>
+            {isAuthor && (
+              <Link href={`/boards/${id}/edit`}>
+                <Button variant="outline" size="sm">
+                  <Edit3 size={16} />
+                  수정
+                </Button>
+              </Link>
+            )}
             <Button 
               variant="danger" 
               size="sm"

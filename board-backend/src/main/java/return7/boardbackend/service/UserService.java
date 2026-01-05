@@ -1,6 +1,8 @@
 package return7.boardbackend.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +16,12 @@ import return7.boardbackend.entity.Board;
 import return7.boardbackend.entity.PasswordResetToken;
 import return7.boardbackend.entity.Reply;
 import return7.boardbackend.entity.User;
-import return7.boardbackend.exception.NicknameNotNullException;
-import return7.boardbackend.exception.NotMatchPasswordException;
-import return7.boardbackend.exception.UserAlreadyExistsException;
-import return7.boardbackend.exception.UserNotFoundException;
+import return7.boardbackend.exception.*;
 import return7.boardbackend.repository.TokenRepository;
 import return7.boardbackend.repository.UserRepository;
+
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -148,10 +150,41 @@ public class UserService {
         tokenRepository.findByUser(user).stream().forEach(PasswordResetToken::forceExpire);
     }
 
+    /** 유저 회원 탈퇴 */
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+
+        for (Board board : user.getBoards()) {
+            board.setUser(null);
+        }
+
+        for (Reply reply : user.getReplies()) {
+            reply.setUser(null);
+        }
+
+        userRepository.deleteById(userId);
+    }
+
+    /** 전체 유저 조회 */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(UserResponse::from).toList();
+    }
+
+    /** 관리자 권한 유저 삭제 */
+    @Transactional
+    public void deleteUser(Long userId, Collection<? extends GrantedAuthority> authorities){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+
+        boolean isAdmin = authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            throw new NoAuthorityException("관리자가 아닙니다.");
+        }
 
         for (Board board : user.getBoards()) {
             board.setUser(null);

@@ -10,6 +10,7 @@ import {
   UserPlus,
   MessageSquare,
   List,
+  Shield,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -18,6 +19,9 @@ export default function Header() {
 
   // 2. 마운트 여부 확인용 state 추가
   const [mounted, setMounted] = useState(false);
+  
+  // ADMIN 권한 확인
+  const isAdmin = user?.authority === 'ADMIN';
 
   // 3. 브라우저에서 렌더링이 완료된 후에만 mounted를 true로 변경
   useEffect(() => {
@@ -58,11 +62,11 @@ export default function Header() {
                 <span className="text-sm text-slate-300">{user?.nickname}</span>
               </div>
 
-              {/* 마이페이지 버튼 */}
-              <Link href="/mypage">
+              {/* 마이페이지 또는 관리 버튼 */}
+              <Link href={isAdmin ? "/admin" : "/mypage"}>
                 <Button variant="ghost" size="sm">
-                  <User size={18} />
-                  <span className="hidden sm:inline">마이페이지</span>
+                  {isAdmin ? <Shield size={18} /> : <User size={18} />}
+                  <span className="hidden sm:inline">{isAdmin ? "관리" : "마이페이지"}</span>
                 </Button>
               </Link>
 
