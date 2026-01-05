@@ -103,7 +103,18 @@ public class ReplyService {
 
         boolean isAdmin = authorities.stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        boolean isWriter = reply.getWriter().getId().equals(userId);
+
+        if (isAdmin) {
+            replyRepository.delete(reply);
+            return null;
+        }
+
+        User writer = reply.getWriter();
+        if (writer == null){
+            throw new WriterNotMatchException("삭제된 유저입니다.");
+        }
+
+        boolean isWriter = writer.getId().equals(userId);
 
         // 삭제되지 않은 자식 댓글만 필터링
         List<Reply> notDeletedChildren = reply.getChildren().stream()
@@ -124,7 +135,7 @@ public class ReplyService {
             return from;
         } else {
             // hard 삭제 (삭제되지 않은 자식 댓글이 없는 경우) - 관리자 또는 해당 유저 가능
-            if(!isAdmin && !isWriter) {
+            if(!isWriter) {
                 throw new NoAuthorityException("해당 권한이 없습니다.");
             }
             
