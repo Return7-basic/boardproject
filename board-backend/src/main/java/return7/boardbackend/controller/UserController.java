@@ -8,7 +8,6 @@ import return7.boardbackend.dto.user.NicknameChangeRequest;
 import return7.boardbackend.dto.user.PasswordChangeRequest;
 import return7.boardbackend.dto.user.UserResponse;
 import return7.boardbackend.dto.user.UserSignupRequest;
-import return7.boardbackend.entity.User;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.UserService;
 
@@ -28,8 +27,9 @@ public class UserController {
     /** 내 정보 조회 */
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(
-     @AuthenticationPrincipal(expression = "user") User user){//principal에서 getUser()호출결과 주입-SpEL
-     return ResponseEntity.ok(UserResponse.from(user));
+     @AuthenticationPrincipal CustomPrincipal principal){
+     // 세션의 User 객체는 오래된 정보일 수 있으므로, DB에서 최신 정보를 조회
+     return ResponseEntity.ok(userService.getMyInfo(principal.getUserId()));
     }
 
     /** 닉네임 변경 */
@@ -52,5 +52,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /** 회원 탈퇴 */
+    @DeleteMapping("/me/delete")
+    public ResponseEntity<Void> deleteUser(
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        userService.deleteUser(principal.getUserId());
+        return ResponseEntity.noContent().build();
+    }
 
 }

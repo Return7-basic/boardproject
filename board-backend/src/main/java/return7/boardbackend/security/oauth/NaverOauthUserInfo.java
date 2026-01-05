@@ -1,6 +1,7 @@
 package return7.boardbackend.security.oauth;
 
 import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("unchecked")
 public class NaverOauthUserInfo implements OauthUserInfo {
@@ -10,6 +11,9 @@ public class NaverOauthUserInfo implements OauthUserInfo {
     public NaverOauthUserInfo(Map<String, Object> attributes) {
         this.response = (Map<String, Object>) attributes.get("response");
     }
+
+    private String nickname = "user_" + UUID.randomUUID().toString().substring(0,5);
+
 
     @Override
     public String getProvider() {
@@ -31,6 +35,6 @@ public class NaverOauthUserInfo implements OauthUserInfo {
         if (response.get("name") != null) {
             return (String) response.get("name");
         }
-        return "";
+        return nickname;
     }
 }

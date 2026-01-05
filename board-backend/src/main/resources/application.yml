@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/boarddb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: devuser
-    password: devpass
+    url: ${SPRING_DB_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
 
   jpa:
     hibernate:
@@ -12,8 +12,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: 본인의-구글-이메일@gmail.com
-    password: 발급받은-앱-비밀번호 # 절대 일반 비밀번호 아님! (2단계 인증 후 발급)
+    username: ${GMAIL_APP_USERNAME}
+    password: ${GMAIL_APP_PASSWORD} # 절대 일반 비밀번호 아님! (2단계 인증 후 발급)
     properties:
       mail:
         smtp:
@@ -26,17 +26,17 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_OAUTH_ID}
-            client-secret: ${GOOGLE_OAUTH_SECRET}
+            client-id: ${GOOGLE_API_ID}
+            client-secret: ${GOOGLE_API_SECRET}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
-              - email
-              - name
+              - https://www.googleapis.com/auth/userinfo.email
+              - https://www.googleapis.com/auth/userinfo.profile
 
           naver:
-            client-id: ${NAVER_OAUTH_ID}
-            client-secret: ${NAVER_OAUTH_SECRET}
+            client-id: ${NAVER_API_ID}
+            client-secret: ${NAVER_API_SECRET}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
@@ -45,13 +45,18 @@ spring:
             client-name: Naver
 
           kakao:
-            client-id: ${KAKAO_OAUTH_ID}
-            client-secret: ${KAKAO_OAUTH_SECRET}
+            client-id: ${KAKAO_API_ID}
+            client-secret: ${KAKAO_API_SECRET}
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}" 
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            # client-authentication-method 관련 설명
+            # 디폴트값 : client_secret_basic <- Authorization Header로 받음
+            # client_secret_post <- POST body(application/x-www-form-urlencoded)에 포함됨.
+            # 카카오톡 OAuth는 보안정책상 POST body로 사용하기 때문에 디폴트값 사용시 401 에러였던 것
+            client-authentication-method: client_secret_post
             scope:
               - profile_nickname
-              - account_email
+              - account_email # 비즈앱 신청함..
             client-name: Kakao
 
         provider:
@@ -68,3 +73,6 @@ spring:
             user-name-attribute: id
 
 
+app:
+  frontend:
+    url: ${NEXT_PUBLIC_API_URL}

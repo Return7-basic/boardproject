@@ -5,10 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import return7.boardbackend.dto.board.BoardDto;
+import return7.boardbackend.dto.board.BoardListResponseDto;
 import return7.boardbackend.security.principal.CustomPrincipal;
 import return7.boardbackend.service.BoardService;
+import return7.boardbackend.service.ReplyService;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/boards")
@@ -28,9 +29,10 @@ public class BoardController {
         return boardService.findById(boardId);
     }
 
+    // FE 작업중 수정 : 반환 타입을 List<BoardDto>에서 BoardListResponseDto로 변경
     /** 게시글 목록 조회 */
     @GetMapping
-    public List<BoardDto> getBoards(
+    public BoardListResponseDto getBoards(
             @RequestParam(defaultValue = "0")int page,//page=0 ->1페이지
             @RequestParam(defaultValue = "10") int size//10개씩출력
     ){

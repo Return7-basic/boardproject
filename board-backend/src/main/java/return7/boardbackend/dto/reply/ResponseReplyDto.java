@@ -1,5 +1,6 @@
 package return7.boardbackend.dto.reply;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import return7.boardbackend.entity.Reply;
 
@@ -14,7 +15,11 @@ public class ResponseReplyDto {
     private Long id;
     private String content;
 
+    @JsonProperty("isSelected")
     private boolean isSelected;
+    
+    @JsonProperty("isDeleted")
+    private boolean isDeleted;
     private int recommendation;
     private int disrecommendation;
 
@@ -28,6 +33,7 @@ public class ResponseReplyDto {
                 .id(reply.getId())
                 .content(reply.getContent())
                 .isSelected(reply.isSelected())
+                .isDeleted(reply.isDeleted())
                 .recommendation(reply.getRecommendation())
                 .disrecommendation(reply.getDisrecommendation())
                 .createdAt(reply.getCreatedAt())

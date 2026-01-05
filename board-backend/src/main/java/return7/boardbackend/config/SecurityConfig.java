@@ -1,6 +1,7 @@
 package return7.boardbackend.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,9 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOauthSuccessHandler customOauthSuccessHandler;
+    
+    @Value("${NEXT_PUBLIC_API_URL}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -31,6 +35,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
 
                         //비로그인 허용 - 조회만 가능
                         .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
@@ -45,8 +51,13 @@ public class SecurityConfig {
                         //회원가입 페이지
                         .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
 
+                        //비밀번호 재설정 (비로그인 허용)
+                        .requestMatchers("/password/**").permitAll()
+
                         //USER 권한
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")
@@ -62,12 +73,30 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // 자체 로그인
+                // 자체 로그인 (SPA용 JSON 응답)
                 .formLogin(form -> form
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/api/login")
                         .usernameParameter("loginId")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/"))
+                        .successHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":true}");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":false,\"message\":\"" + exception.getMessage() + "\"}");
+                        }))
+
+                // API 요청에 대해 401 JSON 응답 (로그인 페이지 리다이렉트 대신)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"로그인이 필요합니다.\"}");
+                        })
+                )
 
                 // oauth2 로그인 (Google, Naver, Kakao)
                 .oauth2Login(oauth2 -> oauth2
@@ -75,13 +104,24 @@ public class SecurityConfig {
                         )
                         // .defaultSuccessUrl("/", true)
                         .successHandler(customOauthSuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            // OAuth2 인증 실패 시 프론트엔드로 리다이렉트
+                            response.sendRedirect(frontendUrl + "/?login=error&message=" + 
+                                java.net.URLEncoder.encode(exception.getMessage(), "UTF-8"));
+                        })
                 )
 
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutUrl("/api/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":true}");
+                        })
                 )
 
                 .userDetailsService(userDetailsService);
@@ -93,7 +133,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
+        corsConfiguration.setAllowedOrigins(List.of(
+                frontendUrl));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
