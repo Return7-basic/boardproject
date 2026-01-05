@@ -87,4 +87,11 @@ public class GlobalExceptionHandler {
                 .body(e.getMessage());
     }
 
+    @ExceptionHandler(MoreWordNeedException.class)
+    public ResponseEntity<String> moreWordNeed(ReplyNotFound e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
 }

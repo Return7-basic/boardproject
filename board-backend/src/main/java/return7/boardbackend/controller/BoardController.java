@@ -57,4 +57,13 @@ public class BoardController {
         boardService.deleteBoard(boardId,principal.getUserId());
         return ResponseEntity.noContent().build();
     }
+
+    /** 게시글 검색 */
+    @GetMapping("/search")
+    public ResponseEntity<BoardListResponseDto> searchBoard(
+            @RequestParam String title,
+            @RequestParam(defaultValue = "0")int page,
+            @RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(boardService.searchBoard(title, page, size));
+    }
 }

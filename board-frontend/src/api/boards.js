@@ -69,3 +69,16 @@ export const downVoteBoard = async (boardId) => {
   return response.data; // { upCount, downCount }
 };
 
+/**
+ * 게시글 검색
+ * @param {string} title - 검색어
+ * @param {number} page 
+ * @param {number} size 
+ */
+export const searchBoards = async (title, page = 0, size = 10) => {
+  const response = await api.get('/api/boards/search', {
+    params: { title, page, size },
+  });
+  return response.data;
+};
+

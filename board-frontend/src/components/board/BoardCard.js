@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Card from '@/components/ui/Card';
 import { Eye, User, Calendar } from 'lucide-react';
 
-export default function BoardCard({ board }) {
+export default function BoardCard({ board, searchKeyword }) {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -29,6 +29,27 @@ export default function BoardCard({ board }) {
     });
   };
 
+  // 제목에서 검색어 하이라이트
+  const highlightTitle = (title, keyword) => {
+    if (!keyword || keyword.trim().length === 0) {
+      return title;
+    }
+    
+    // 대소문자 구분 없이 검색어 찾기
+    const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = title.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <span key={index} className="text-yellow-400 underline">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+
   return (
     <Link href={`/boards/${board.id}`}>
       <Card hover className="p-5 transition-all duration-300 group">
@@ -37,7 +58,7 @@ export default function BoardCard({ board }) {
           <div className="flex-1 min-w-0">
             {/* 제목 */}
             <h3 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition-colors truncate mb-2">
-              {board.title}
+              {highlightTitle(board.title, searchKeyword)}
             </h3>
             
             {/* 메타 정보 */}

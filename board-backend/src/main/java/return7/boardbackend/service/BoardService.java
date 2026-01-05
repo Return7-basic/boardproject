@@ -147,4 +147,20 @@ public class BoardService {
 
         return b;
     }
+
+    /** 게시글 검색 기능 */
+    @Transactional(readOnly = true)
+    public BoardListResponseDto searchBoard(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        if (title.length() < 2) {
+            throw new MoreWordNeedException("두글자 이상 검색해주세요");
+        }
+
+        Page<Board> finded = boardRepository.findByStringLike(title, pageable);
+
+        List<BoardDto> list = finded.stream().map(BoardDto::from).toList();
+        boolean hasNext = finded.hasNext();
+
+        return new BoardListResponseDto(list, hasNext);
+    }
 }

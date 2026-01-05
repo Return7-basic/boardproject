@@ -8,7 +8,8 @@ import {
   updateBoard, 
   deleteBoard,
   upVoteBoard,
-  downVoteBoard 
+  downVoteBoard,
+  searchBoards
 } from '@/api/boards';
 import { useRouter } from 'next/navigation';
 
@@ -17,6 +18,15 @@ export function useBoards(page = 0, size = 10) {
   return useQuery({
     queryKey: ['boards', page, size],
     queryFn: () => getBoards(page, size),
+  });
+}
+
+// 게시글 검색 훅
+export function useSearchBoards(keyword, page = 0, size = 10) {
+  return useQuery({
+    queryKey: ['boards', 'search', keyword, page, size],
+    queryFn: () => searchBoards(keyword, page, size),
+    enabled: !!keyword && keyword.trim().length > 0,
   });
 }
 
