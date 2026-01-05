@@ -54,17 +54,22 @@ public class SecurityConfig {
                         //비밀번호 재설정 (비로그인 허용)
                         .requestMatchers("/password/**").permitAll()
 
-                        //USER 권한
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/api/boards/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasRole("USER")
+                        //USER 또는 ADMIN 권한 (내 정보 관련)
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/users/me/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/me/**").hasAnyRole("USER", "ADMIN")
+                        
+                        //USER 권한 (기타 사용자 관련)
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/boards/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/boards/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*").hasAnyRole("USER", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/boards/*/replies/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/boards/*/replies/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/*").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/boards/*/replies/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/boards/*/replies/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/boards/*/replies/*").hasAnyRole("USER", "ADMIN")
 
                         //ADMIN 권한
                         .requestMatchers("/api/**").hasRole("ADMIN")
