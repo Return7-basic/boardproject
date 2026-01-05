@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useBoard, useDeleteBoard, useUpVoteBoard, useDownVoteBoard } from '@/hooks/useBoards';
 import { useAuth } from '@/hooks/useAuth';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { cleanupDeletedReplies } from '@/api/replies';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
@@ -20,12 +22,14 @@ import {
   Eye,
   User,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 
 export default function BoardDetailPage({ params }) {
   const { id } = use(params);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user, isLoggedIn } = useAuth();
   const { data: board, isLoading, isError } = useBoard(id);
   const deleteBoard = useDeleteBoard();
@@ -33,6 +37,7 @@ export default function BoardDetailPage({ params }) {
   const downVote = useDownVoteBoard();
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [cleanupResult, setCleanupResult] = useState(null);
 
   // 작성자 본인인지 확인
   const isAuthor = isLoggedIn && user && board && 
@@ -40,6 +45,20 @@ export default function BoardDetailPage({ params }) {
   
   // ADMIN 권한 확인
   const isAdmin = isLoggedIn && user && user.authority === 'ADMIN';
+
+  // 댓글 정리 뮤테이션 (관리자 전용)
+  const cleanupMutation = useMutation({
+    mutationFn: () => cleanupDeletedReplies(id),
+    onSuccess: (deletedCount) => {
+      setCleanupResult(`${deletedCount}개의 댓글이 정리되었습니다.`);
+      queryClient.invalidateQueries({ queryKey: ['replies', id] });
+      setTimeout(() => setCleanupResult(null), 3000);
+    },
+    onError: (error) => {
+      setCleanupResult('댓글 정리에 실패했습니다.');
+      setTimeout(() => setCleanupResult(null), 3000);
+    },
+  });
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -115,9 +134,32 @@ export default function BoardDetailPage({ params }) {
       <Card className="p-6 lg:p-8 mb-6">
         {/* 헤더 */}
         <div className="mb-6 pb-6 border-b border-slate-700">
-          <h1 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-            {board.title}
-          </h1>
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <h1 className="text-2xl lg:text-3xl font-bold text-white">
+              {board.title}
+            </h1>
+            
+            {/* 댓글 정리 버튼 (관리자 전용) */}
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => cleanupMutation.mutate()}
+                disabled={cleanupMutation.isPending}
+                className="shrink-0 border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
+              >
+                <Sparkles size={16} />
+                {cleanupMutation.isPending ? '정리 중...' : '댓글 정리'}
+              </Button>
+            )}
+          </div>
+
+          {/* 댓글 정리 결과 메시지 */}
+          {cleanupResult && (
+            <div className="mb-4 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400 text-sm">
+              {cleanupResult}
+            </div>
+          )}
           
           <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
             <div className="flex items-center gap-1.5">

@@ -90,3 +90,12 @@ export const downVoteReply = async (boardId, replyId) => {
   return response.data;
 };
 
+/**
+ * 삭제된 댓글 정리 (관리자 전용)
+ * @param {number} boardId 
+ */
+export const cleanupDeletedReplies = async (boardId) => {
+  const response = await api.post(`/api/boards/${boardId}/replies/cleanup`);
+  return response.data;
+};
+
