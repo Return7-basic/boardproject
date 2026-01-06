@@ -31,9 +31,11 @@ public class BoardDto {
                 .viewCount(board.getViewCount())
                 .upCount(board.getUpCount())
                 .downCount(board.getDownCount())
-                .writerLoginId(board.getWriter().getLoginId())
-                .writerNickname(board.getWriter().getNickname())
                 .createdAt(board.getCreatedAt())
+
+                .writerLoginId(board.getWriter()!=null?board.getWriter().getLoginId():"삭제된 사용자")
+                .writerNickname(board.getWriter()!=null?board.getWriter().getLoginId():"삭제된 사용자")
+
                 .build();
     }
 }
