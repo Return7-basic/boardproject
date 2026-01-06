@@ -13,7 +13,8 @@
 
 ### 멋쟁이사자처럼 백엔드 부트캠프 19기: Java <br> 팀 기초 프로젝트 @Return7
 
-[AWS-EC2-DNS-URL 바로가기](http://ec2-13-124-99-42.ap-northeast-2.compute.amazonaws.com/)
+<a href="http://ec2-13-124-99-42.ap-northeast-2.compute.amazonaws.com/" target="_blank">AWS-EC2-DNS-URL 바로가기</a>
+
 
 ![readme-main](./docs/images/readme-main.png)
 
