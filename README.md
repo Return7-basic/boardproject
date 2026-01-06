@@ -129,7 +129,7 @@ boardproject/
 
 프로젝트 관련 상세 문서는 `docs/` 폴더에서 참고 바랍니다 :
 
-- 🔀 [시스템 흐름 정보](./docs/00-project-design-and-flow.md)
+- 🔀 [프로젝트 설계 및 플로우](./docs/00-project-design-and-flow.md)
 - 🚩 [프로젝트 실행](./docs/01-project-run.md)
 - 📡 [API 명세서](./docs/02-api-specification.md)
 - ☁️ [AWS 배포](./docs/03-deploy.md)
@@ -139,8 +139,8 @@ boardproject/
 
 백엔드 프론트 관련 정보는 각 폴더의 `README.md` 파일에서 참고 바랍니다 :
 
-- 🖥️ [Board Backend](./board-backend/README.md)
-- 🖥️ [Board Frontend](./board-frontend/README.md)
+- 🖥️ [Board Backend](./board-backend/)
+- 🖥️ [Board Frontend](./board-frontend/)
 
 ---
 
