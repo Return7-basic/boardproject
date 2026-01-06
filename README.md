@@ -129,7 +129,7 @@ boardproject/
 
 프로젝트 관련 상세 문서는 `docs/` 폴더에서 참고 바랍니다 :
 
-- 🔀 [시스템 흐름 정보](./docs/00-project-flow-info.md)
+- 🔀 [시스템 흐름 정보](./docs/00-project-design-and-flow.md)
 - 🚩 [프로젝트 실행](./docs/01-project-run.md)
 - 📡 [API 명세서](./docs/02-api-specification.md)
 - ☁️ [AWS 배포](./docs/03-deploy.md)

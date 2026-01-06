@@ -68,7 +68,7 @@ npm run dev
 
 ---
 
-## 2. Docker ompose로 실행 (Dokcer-Desktop)
+## 2. Docker compose로 실행 (Dokcer-Desktop)
 
 ### 2.1 환경 변수 설정 (`.env`)
 
@@ -120,3 +120,5 @@ docker-compose down
 ---
 
 ## 3. AWS EC2로 실행
+
+관련 문서는 [AWS 배포](./03-deploy.md) 에서 참고 바랍니다.
