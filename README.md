@@ -14,39 +14,40 @@
 
 ![readme-main](./docs/images/readme-main.png)
 
+### 멋쟁이사자처럼 백엔드 부트캠프 19기: Java <br> 팀 기초 프로젝트 @Return7
 
 </div>
 
-- url : http://ec2-13-124-99-42.ap-northeast-2.compute.amazonaws.com/
 
 
-> 멋쟁이사자처럼 java 19기 - Return 7
 
 - [![GitHub](https://img.shields.io/badge/이희찬-corqu-181717?logo=github&logoColor=white)](https://github.com/corqu)
 - [![GitHub](https://img.shields.io/badge/정재윤-Jeong--Jae--yun-181717?logo=github&logoColor=white)](https://github.com/Jeong-Jae-yun)
 - [![GitHub](https://img.shields.io/badge/김영진-Kim--youngjin8645-181717?logo=github&logoColor=white)](https://github.com/Kim-youngjin8645)
 - [![GitHub](https://img.shields.io/badge/정병천-star1431-181717?logo=github&logoColor=white)](https://github.com/star1431)
 
-
 ---
 
-## 1. 프로젝트 개요
+## 1. 프로젝트 정보
 
-Q&A Board는 사용자들이 질문을 올리고 답변을 받을 수 있는 커뮤니티 게시판 서비스입니다.<br>
+### 1.1 개요
+
+Q&A Board는 사용자들이 질문을 올리고 답변을 받을 수 있는 커뮤니티 게시판 서비스입니다.
 OAuth2 소셜 로그인, 이메일 인증, 실시간 댓글 및 채택 기능을 제공합니다.
 
-### 프로젝트 목적
 
-- 팀 기초 프로젝트
+### 1.2 개발 기간
 
-### 주요 기능
+- 2025-12-22 ~ 2026-01-06
+
+### 1.3 주요 기능
 
 - **소셜 로그인**: Google, Naver, Kakao OAuth2 인증
 - **이메일 인증**: 비밀번호 찾기 및 재설정 기능
 - **Q&A 게시판**: 질문 작성, 답변, 댓글 기능
 - **답변 채택**: 질문자에게 유용한 답변 채택 기능
 - **사용자 관리**: 마이페이지, 닉네임 설정
-- **관리자..?**: ...?
+- **관리자 기능**: 게시글 및 댓글 관리, 사용자 관리
 
 ---
 
