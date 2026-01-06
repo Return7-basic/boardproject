@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import return7.boardbackend.entity.User;
 import return7.boardbackend.enums.Authority;
 import return7.boardbackend.repository.UserRepository;
-import return7.boardbackend.service.UserService;
 
 @Slf4j
 @SpringBootApplication
