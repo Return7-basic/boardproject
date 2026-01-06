@@ -114,13 +114,22 @@ public class BoardService {
         User user = userRepository.findById(loginUserId)
                 .orElseThrow(()->new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
-        boolean isWriter = board.getWriter().getId().equals(user.getId());//작성자인가?
         boolean isAdmin = user.getAuthority() == Authority.ADMIN;//관리자인가?
-
-        if(!isWriter && !isAdmin){//작성자 혹은 관리자인지?
-            throw new NoAuthorityException("삭제 권한이 없습니다.");
+        if(isAdmin){
+            boardRepository.deleteById(boardId);
+            return;
         }
-        boardRepository.delete(board);
+        User writer = board.getWriter();
+        if (writer == null) {
+            throw new UserNotFoundException("삭제된 유저입니다.");
+        }
+        else {
+            boolean isWriter = writer.getId().equals(user.getId());//작성자인가?
+            if (isWriter) {
+                boardRepository.deleteById(boardId);
+                return;
+            }
+        }
     }
 
     /** 게시글의 댓글 채택 */
