@@ -63,6 +63,10 @@ export function useCreateReply(boardId) {
       // 댓글 목록 갱신 (대댓글 작성 시 채택된 댓글의 children도 업데이트되도록)
       queryClient.invalidateQueries({ queryKey: ['replies', boardId] });
       queryClient.invalidateQueries({ queryKey: ['selectedReply', boardId] });
+      // 게시글 목록 갱신 (댓글 수 반영)
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+      // 게시글 상세 정보 갱신 (댓글 수 반영)
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
     },
   });
 }
@@ -225,6 +229,8 @@ export function useSelectReply(boardId) {
       queryClient.invalidateQueries({ queryKey: ['replies', boardId] });
       queryClient.invalidateQueries({ queryKey: ['selectedReply', boardId] });
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      // 게시글 목록 갱신 (채택 여부 반영)
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 }

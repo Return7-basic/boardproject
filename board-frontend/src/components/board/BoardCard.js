@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
-import { Eye, User, Calendar } from 'lucide-react';
+import { Eye, User, Calendar, ThumbsUp, ThumbsDown, CheckCircle2, MessageSquare } from 'lucide-react';
 
 export default function BoardCard({ board, searchKeyword }) {
   const formatDate = (dateString) => {
@@ -52,14 +52,32 @@ export default function BoardCard({ board, searchKeyword }) {
 
   return (
     <Link href={`/boards/${board.id}`}>
-      <Card hover className="p-5 transition-all duration-300 group">
+      <div className="
+        bg-slate-800/50 backdrop-blur-sm
+        border-l-0 border-r-0 border-t border-b border-slate-700/50
+        border-t-transparent
+        rounded-none
+        hover:border-indigo-500/50 hover:border-t-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/10 
+        transition-all duration-300
+        p-5
+        group
+      ">
         <div className="flex items-start justify-between gap-4">
           {/* 게시글 정보 */}
           <div className="flex-1 min-w-0">
             {/* 제목 */}
-            <h3 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition-colors truncate mb-2">
-              {highlightTitle(board.title, searchKeyword)}
-            </h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition-colors truncate flex-1 min-w-0">
+                {highlightTitle(board.title, searchKeyword)}
+              </h3>
+              {/* 채택 표시 */}
+              {board.replySelected && (
+                <div className="flex items-center gap-1 px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded text-xs text-green-400 flex-shrink-0">
+                  <CheckCircle2 size={12} />
+                  <span>채택</span>
+                </div>
+              )}
+            </div>
             
             {/* 메타 정보 */}
             <div className="flex items-center gap-4 text-sm text-slate-400">
@@ -76,16 +94,34 @@ export default function BoardCard({ board, searchKeyword }) {
                 <Calendar size={14} className="text-slate-500" />
                 <span>{formatDate(board.createdAt)}</span>
               </div>
+              
+              {/* 추천 */}
+              <div className="flex items-center gap-1.5">
+                <ThumbsUp size={14} className="text-indigo-400" />
+                <span className="text-indigo-400">{board.upCount || 0}</span>
+              </div>
+              
+              {/* 비추천 */}
+              <div className="flex items-center gap-1.5">
+                <ThumbsDown size={14} className="text-slate-500" />
+                <span>{board.downCount || 0}</span>
+              </div>
             </div>
           </div>
           
-          {/* 조회수 */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 rounded-lg text-sm text-slate-400">
-            <Eye size={14} />
-            <span>{board.viewCount}</span>
+          {/* 조회수 및 댓글 수 */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 rounded-lg text-sm text-slate-400">
+              <Eye size={14} />
+              <span>{board.viewCount}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 rounded-lg text-sm text-slate-400">
+              <MessageSquare size={14} />
+              <span>{board.replyCount || 0}</span>
+            </div>
           </div>
         </div>
-      </Card>
+      </div>
     </Link>
   );
 }

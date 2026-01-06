@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useBoard, useDeleteBoard, useUpVoteBoard, useDownVoteBoard } from '@/hooks/useBoards';
@@ -91,6 +91,20 @@ export default function BoardDetailPage({ params }) {
     }
     downVote.mutate(id);
   };
+
+  // 게시글 조회 시 조회수 증가 후 목록 쿼리 무효화 (조회수 반영)
+  useEffect(() => {
+    if (board) {
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    }
+  }, [board, queryClient]);
+
+  // 페이지를 떠날 때 목록 쿼리 무효화 (뒤로가기, 게시판 버튼 클릭 등)
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
+    };
+  }, [queryClient]);
 
   // 로딩 상태
   if (isLoading) {

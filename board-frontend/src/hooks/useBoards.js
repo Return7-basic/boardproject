@@ -89,6 +89,7 @@ export function useUpVoteBoard() {
   return useMutation({
     mutationFn: upVoteBoard,
     onSuccess: (data, boardId) => {
+      // 상세 페이지 데이터 업데이트
       const previousBoard = queryClient.getQueryData(['board', boardId]);
       if (previousBoard && data) {
         queryClient.setQueryData(['board', boardId], {
@@ -97,6 +98,8 @@ export function useUpVoteBoard() {
           downCount: data.downCount,
         });
       }
+      // 목록 페이지 데이터 무효화 (목록으로 돌아갔을 때 최신 데이터 표시)
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 }
@@ -108,6 +111,7 @@ export function useDownVoteBoard() {
   return useMutation({
     mutationFn: downVoteBoard,
     onSuccess: (data, boardId) => {
+      // 상세 페이지 데이터 업데이트
       const previousBoard = queryClient.getQueryData(['board', boardId]);
       if (previousBoard && data) {
         queryClient.setQueryData(['board', boardId], {
@@ -116,6 +120,8 @@ export function useDownVoteBoard() {
           downCount: data.downCount,
         });
       }
+      // 목록 페이지 데이터 무효화 (목록으로 돌아갔을 때 최신 데이터 표시)
+      queryClient.invalidateQueries({ queryKey: ['boards'] });
     },
   });
 }
