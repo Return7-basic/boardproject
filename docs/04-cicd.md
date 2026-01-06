@@ -126,7 +126,7 @@ jobs:
 
 ```bash
 # 서버 접속
-ssh -i your-key.pem ubuntu@your-server
+ssh -i <인스턴스키>.pem ec2-user@<퍼블릭IPv4주소>
 
 # 컨테이너 상태 확인
 cd ~/app
@@ -182,11 +182,17 @@ docker build -t test-backend .
 - **형식**: `v{주버전}.{부버전}.{패치버전}`
 - **예시**: `v1.0.0`, `v1.1.4`, `v2.0.0`
 
-### 태그 관리
+### 태그 관리 명령어
 
 ```bash
 # 태그 목록 확인
 git tag
+
+# 최신 커밋에 태그 생성
+git tag v1.1.4
+
+# 태그를 원격 저장소에 푸시
+git push origin v1.1.4
 
 # 특정 태그 삭제 (로컬)
 git tag -d v1.1.4

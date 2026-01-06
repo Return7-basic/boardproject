@@ -50,7 +50,7 @@ icacls.exe "<인스턴스키>.pem" /inheritance:r
 ### 1. 서버 접속
 
 ```bash
-ssh -i <인스턴스키>.pem ubuntu@<퍼블릭IPv4주소>
+ssh -i <인스턴스키>.pem ec2-user@<퍼블릭IPv4주소>
 ```
 
 ### 2. 필수 패키지 설치
@@ -227,7 +227,7 @@ docker push <DOCKER_USERNAME>/return7-frontend:latest
 #### 4. 서버에서 이미지 Pull 및 배포
 
 ```bash
-ssh -i <인스턴스키>.pem ubuntu@<퍼블릭IPv4주소>
+ssh -i <인스턴스키>.pem ec2-user@<퍼블릭IPv4주소>
 cd ~/app
 
 # 최신 이미지 Pull
