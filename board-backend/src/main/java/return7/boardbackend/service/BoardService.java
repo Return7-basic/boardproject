@@ -68,8 +68,9 @@ public class BoardService {
 
     /**
      * 게시글 상세 조회
+     * 2026-01-07 : feat - 조회 메서드 트랜잭셔널 유형 누락 수정 (쓰기->읽기)
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public BoardDto findById(Long boardId){
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("게시글이 존재하지 않습니다."));
